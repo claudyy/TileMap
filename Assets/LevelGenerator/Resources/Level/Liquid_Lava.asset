@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 645a2483c55a830449711d2cb974947b, type: 3}
+  m_Name: Liquid_Lava
+  m_EditorClassIdentifier: 
+  tile: {fileID: 11400000, guid: 87a94a67ed9fc5447a719bbadf5b62a2, type: 2}
+  ruleTile: {fileID: 11400000, guid: 52dd1d97b2ff5e64986c9206a34f8470, type: 2}
+  health: -1
+  type: 0
+  maxWater: 100
+  flowSpeed: 0.03
+  flowAmount: 8
+  stickAmount: 20
+  touchWater: {fileID: 11400000, guid: f8226c26fce752b4c96cf11d19db2714, type: 2}

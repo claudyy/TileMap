@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6790997bbc7e93479435a4960e9084f, type: 3}
+  m_Name: Liquid_Oil
+  m_EditorClassIdentifier: 
+  tile: {fileID: 11400000, guid: 87a94a67ed9fc5447a719bbadf5b62a2, type: 2}
+  ruleTile: {fileID: 11400000, guid: a6ec0a9bc1f96d4469f0ae42138d2ee3, type: 2}
+  health: -1
+  type: 0
+  maxWater: 10
+  flowSpeed: 0.03
+  flowAmount: 1
+  stickAmount: 1

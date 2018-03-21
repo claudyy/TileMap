@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 640f7914e539c9541b7b2eda462ea2a4, type: 3}
+  m_Name: Biom4
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  randomDistanceFromCenter: {x: 0, y: 0}
+  size: {x: 0, y: 0}
+  sizeX: 240
+  sizeY: 120
+  baseTile: {fileID: 11400000, guid: f8226c26fce752b4c96cf11d19db2714, type: 2}
+  border:
+    noiseTexture: []
+  borderBlend: 0.5
+  wallData: []
+  structure: []
+  plants: []
+  oreList:
+  - data: {fileID: 11400000, guid: f8226c26fce752b4c96cf11d19db2714, type: 2}
+    depositSize: {x: 3, y: 5}
+    depositCount: {x: 20, y: 30}
+    minDistanceBetweenDeposit: 5

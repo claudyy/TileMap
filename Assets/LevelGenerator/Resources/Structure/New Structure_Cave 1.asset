@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c90821527f2ddef448593d5daf3f0fcd, type: 3}
+  m_Name: New Structure_Cave 1
+  m_EditorClassIdentifier: 
+  sizeX: 24
+  sizeY: 24
+  noise: {fileID: 2800000, guid: 69956b571b899504b8942ce336c10ff4, type: 3}
+  tunnelTex: {fileID: 2800000, guid: 6d06c609d72ab6449ab2c3a508e6ffea, type: 3}
+  caveTex: {fileID: 2800000, guid: c02ace12d56f3514eba95d7b6bbf3c0e, type: 3}
+  tileData: {fileID: 11400000, guid: 54929bcf8aaab6044829f4a3a3b55bf7, type: 2}
+  tunnelSegmentWidth: {x: 6, y: 12}
+  tunnelSegmentLenght: {x: 8, y: 18}
+  tunnelNumber: {x: 16, y: 28}
+  tunnelRandomAngle: {x: 10, y: 60}
+  borderPadding: 20
+  caveNumber: {x: 2, y: 6}
+  caveRandomSize: {x: 12, y: 32}
