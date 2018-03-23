@@ -38,6 +38,7 @@ public class TileBehavior_Liquid : BaseTileBehvior {
                 Flow(dir, level, tile);
             }
         }
+        tile.needUpdate = true;
     }
     bool DelayErase(LevelTilemap level, LevelTile tile) {
         if (liquidAmount > 0) {
@@ -128,6 +129,8 @@ public class TileBehavior_Liquid : BaseTileBehvior {
         delayedErase = delayedEraseMax;
     }
     public virtual bool CanFlowToPos(int x, int y, LevelTilemap level) {
+        if (level.IsPosOutOfBound(x, y))
+            return false;
         if (level.IsEmpty(x, y))
             return true;
         var liquid = GetLiquidTile(x, y, level);

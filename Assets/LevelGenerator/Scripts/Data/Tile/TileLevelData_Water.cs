@@ -8,13 +8,14 @@ public class TileBehavior_Water : TileBehavior_Liquid {
     public override void Init(LevelTilemap level, LevelTile tile) {
         base.Init(level, tile);
         waterData = tile.data as TileLevelData_Water;
+        polluted = 0;
     }
     protected override TileLevelData_Liquid GetData() {
         return waterData;
     }
     protected override void FillOtherLiquid(TileBehavior_Liquid other, LevelTile otherTile, LevelTilemap level) {
         var water = otherTile.behavior as TileBehavior_Water;
-        if (water != null) {
+        if (water != null && polluted != 0) {
             float p = Mathf.Clamp(1, 0, water.maxPolluted - water.polluted);
             water.polluted += p;
             polluted -= p/2;
@@ -23,7 +24,7 @@ public class TileBehavior_Water : TileBehavior_Liquid {
     }
     protected override void FillLiquidBelow(TileBehavior_Liquid other, LevelTile otherTile, LevelTilemap level) {
         var water = otherTile.behavior as TileBehavior_Water;
-        if (water != null) {
+        if (water != null && polluted != 0) {
             float p = Mathf.Clamp(1, 0, water.maxPolluted - water.polluted);
             water.polluted += p;
             polluted -= p/2;

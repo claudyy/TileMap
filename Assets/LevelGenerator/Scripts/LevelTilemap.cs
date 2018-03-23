@@ -5,7 +5,35 @@ using UnityEngine.Tilemaps;
 
 using System;
 using System.Linq;
-[ExecuteInEditMode]
+using System.Text;
+using System.Diagnostics;
+
+using System.Xml;
+using System.IO;
+using System.Xml.Serialization;
+[System.Serializable]
+public class TileSaveData {
+    public string tileDataName="";
+    public int health;
+    public TileSaveData() {
+
+    }
+    public TileSaveData(TileLevelData data) {
+        if (data == null)
+            return;
+        tileDataName = data.name;
+    }
+}
+[System.Serializable]
+public class TileMapSaveData {
+    public TileMapSaveData() {
+
+    }
+    public int sizeX;
+    public int sizeY;
+    public TileSaveData[] tiles;
+}
+
 public class LevelTilemap : MonoBehaviour {
     public TileLevelData defaultTileData;
     public Tilemap tilemap;
@@ -21,7 +49,9 @@ public class LevelTilemap : MonoBehaviour {
     float curUpdate;
     int updateX = 0;
     int updateY = 0;
+    public bool loadOnAwake;
     public bool onlyUpdateVisible;
+    public bool dontUpdate;
     //
     public int sizeX
     {
@@ -40,41 +70,65 @@ public class LevelTilemap : MonoBehaviour {
 
     private void Awake()
     {
+        if (loadOnAwake) {
+            Load();
+        }
         return;
+
         for (int x = 0; x < levelChunkX; x++)
         {
             for (int y = 0; y < levelChunkY; y++)
             {
-                tileMapList[y * levelChunkX + x].Init(this);
+                //tileMapList[y * levelChunkX + x].Init(x,y,this);
             }
         }
 
     }
-    private void Update()
-    {
-        //curUpdate += Time.deltaTime;
-        //if (curUpdate < updateRate)
-        //    return;
-        //curUpdate = 0;
-        //if (onlyUpdateVisible) {
-        //    UpdateVisible();
-        //    return;
-        //}
-        //updateX++;
-        //if(updateX >= levelChunkX)
-        //{
-        //    updateX = 0;
-        //    updateY++;
-        //    if (updateY >= levelChunkY)
-        //    {
-        //        updateY = 0;
-        //    }
-        //}
-        //    
-        //GetTileMap(updateX, updateY).UpdateTileMap(this);
+    Coroutine updateVisivleCoroutine;
+    private void Start() {
+
+        updateVisivleCoroutine = StartCoroutine(UpdateVisible());
 
     }
-    void UpdateVisible() {
+    void InitFromDataName() {
+        for (int x = 0; x < levelChunkX; x++) {
+            for (int y = 0; y < levelChunkY; y++) {
+                //GetTileMap(x,y).GenerateDataList(x, y, chunkSize);
+                GetTileMap(x, y).Init(this);
+            }
+        }
+    }
+    private void Update()
+    {
+        return;
+        if (dontUpdate)
+            return;
+        curUpdate += Time.deltaTime;
+        if (curUpdate < updateRate)
+            return;
+        curUpdate = 0;
+        if (onlyUpdateVisible) {
+            UpdateVisible();
+            return;
+        }
+        updateX++;
+        if(updateX >= levelChunkX)
+        {
+            updateX = 0;
+            updateY++;
+            if (updateY >= levelChunkY)
+            {
+                updateY = 0;
+            }
+        }
+            
+        GetTileMap(updateX, updateY).UpdateVisible(this);
+
+    }
+    IEnumerator UpdateAllTiles() {
+        yield return null;
+    }
+    IEnumerator UpdateVisible() {
         Vector3Int midChunk = PosToChunk((int)Camera.main.transform.position.x, (int)Camera.main.transform.position.y);
         int fromX = Mathf.Clamp(midChunk.x - 1,0, levelChunkX -1);
         int toX = Mathf.Clamp(midChunk.x + 1,0, levelChunkX - 1);
@@ -82,20 +136,25 @@ public class LevelTilemap : MonoBehaviour {
         int toY = Mathf.Clamp(midChunk.y + 1,0, levelChunkY - 1);
         for (int x = fromX; x <= toX; x++) {
             for (int y = fromY; y <= toY; y++) {
-                GetTileMap(x, y).UpdateTileMap(this);
+                GetTileMap(x, y).UpdateVisible(this);
+                //UnityEngine.Debug.Log("Update");
             }
         }
+        yield return null;
+        updateVisivleCoroutine = StartCoroutine(UpdateVisible());
     }
     public IEnumerator UpdatePrefabFromData() {
+        var tileMap = tilemapPrefab.GetComponentInChildren<Tilemap>();
+        tileMap.ClearAllTiles();
         for (int cx = 0; cx < levelChunkX; cx++) {
             for (int cy = 0; cy < levelChunkY; cy++) {
                 for (int x = 0; x < chunkSize; x++) {
                     for (int y = 0; y < chunkSize; y++) {
-                        var tile = GetTileMap(cx, cy).GetData(x, y);
+                        var chunk = GetTileMap(cx, cy);
+                        var tile = chunk.GetData(x, y);
                         if (tile == null)
                             tile = defaultTileData;
-                        tilemapPrefab.GetComponentInChildren<Tilemap>().SetTile(new Vector3Int(x + cx * chunkSize, y + cy * chunkSize,0), tile.GetTile());
-                        //tilemap.SetTile(new Vector3Int(x + cx * chunkSize, y + cy * chunkSize,0), tile.GetTile());
+                        tileMap.SetTile(chunk.ToTilePosition(x,y), tile.GetTile());
                     }
                 }
                 
@@ -112,6 +171,78 @@ public class LevelTilemap : MonoBehaviour {
         //tilemap.SetTile(new Vector3Int(1,0, 0), defaultTileData.GetTile());
         //tilemap.ClearAllTiles();
     }
+
+    public void Load() {
+        XmlSerializer serializer = new XmlSerializer(typeof(TileMapSaveData));
+        FileStream stream = new FileStream(Application.dataPath + "/Test.xml", FileMode.Open);
+        var st = serializer.Deserialize(stream) as TileMapSaveData;
+        stream.Close();
+        Resize(st.sizeX, st.sizeY);
+        TileLevelData tile = null;
+        //UnityEngine.Debug.Log(sizeX + sizeY * sizeX);
+        //UnityEngine.Debug.Log(st.tiles.Length);
+        StringBuilder str = new StringBuilder();
+        Stopwatch w = new Stopwatch();
+        str.Append("Load Data : ");
+        w.Reset();
+        w.Start();
+        var allData = Resources.LoadAll("", typeof(TileLevelData)).Cast<TileLevelData>().ToArray();
+        for (int x = 0; x < st.sizeX; x++) {
+            for (int y = 0; y < st.sizeY; y++) {
+                tile = GetDataFromList(st.tiles[x + y * st.sizeX].tileDataName, allData);
+                OverrideDataNameTile(x, y, tile);
+            }
+        }
+        str.AppendLine(" Duration: "+ w.Elapsed);
+        //UpdatePrefabFromData();
+        //GenerateGridFromPrefab();
+        str.Append("Init: ");
+        w.Reset();
+        w.Start();
+        InitFromDataName();
+        str.AppendLine(" Duration: " + w.Elapsed);
+
+        str.Append("TileMap Cleare : ");
+        w.Reset();
+        w.Start();
+        //tilemap.ClearAllTiles();
+        str.AppendLine(" Duration: " + w.Elapsed);
+
+        str.Append("UpdateView : ");
+        w.Reset();
+        w.Start();
+        //UpdateViews();
+        str.AppendLine(" Duration: " + w.Elapsed);
+
+        UnityEngine.Debug.Log(str.ToString());
+    }
+
+    public void Save() {
+       var st =  new TileMapSaveData();
+        st.sizeX = sizeX;
+        st.sizeY = sizeY;
+        st.tiles = new TileSaveData[sizeX + sizeY * sizeX];
+        UnityEngine.Debug.Log(sizeX + sizeY * sizeX);
+        UnityEngine.Debug.Log(st.tiles.Length);
+
+        int cx = 0;
+        int cy = 0;
+        TileLevelData tile = null;
+        for (int x = 0; x < sizeX; x++) {
+            for (int y = 0; y < sizeY; y++) {
+                cx = PosToChunk(x, y).x;
+                cy = PosToChunk(x, y).y;
+                tile = GetTileMap(cx, cy).GetTile(PosToPosInChunk(x,y).x, PosToPosInChunk(x, y).y).data;
+                st.tiles[x+y*sizeX] = new TileSaveData(tile);
+            }
+        }
+
+        XmlSerializer serializer = new XmlSerializer(typeof(TileMapSaveData));
+        FileStream stream = new FileStream(Application.dataPath + "/Test.xml", FileMode.Create);
+        serializer.Serialize(stream,st);
+        stream.Close();
+    }
+
     public TileLevelData GetDataFromList(string name, TileLevelData[] list) {
         if (name == "")
             return null;
@@ -159,8 +290,8 @@ public class LevelTilemap : MonoBehaviour {
     }
 
     internal void Resize(int x, int y) {
-        int chunkX = 1 + x / chunkSize;
-        int chunkY = 1 + y / chunkSize;
+        int chunkX = (int)Math.Round((float)x / chunkSize);
+        int chunkY = (int)Math.Round((float)y / chunkSize);
         levelChunkX = chunkX;
         levelChunkY = chunkY;
         GenerateTileSets();
@@ -168,7 +299,7 @@ public class LevelTilemap : MonoBehaviour {
 
     SubTileMap GetTileMap(int x, int y)
     {
-        return tileMapList[y * levelChunkX + x];
+        return tileMapList[x + y * levelChunkX];
     }
     public void UpdateViews()
     {

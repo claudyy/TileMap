@@ -88,6 +88,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ShowResolutionOverlay: 1
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -176,7 +177,7 @@ SpriteRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_StitchSeams: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -246,7 +247,7 @@ PolygonCollider2D:
     m_Paths:
     - - {x: -0.5, y: -0.5}
       - {x: -0.5, y: 0.47}
-      - {x: 0.0, y: 0.54}
+      - {x: 0, y: 0.54}
       - {x: 0.5, y: 0.47}
       - {x: 0.5, y: -0.5}
 --- !u!1 &154894189
@@ -360,7 +361,7 @@ TilemapRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_StitchSeams: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -373,7 +374,6 @@ TilemapRenderer:
   m_MaxChunkCount: 16
   m_MaxFrameAge: 16
   m_SortOrder: 0
-  m_Mode: 0
   m_MaskInteraction: 0
 --- !u!1839735485 &154894195
 Tilemap:
@@ -1600,10 +1600,14 @@ Tilemap:
     e32: 0
     e33: 1
   m_TileRefreshArray:
-  - m_DirtyIndex: 0
-  - m_DirtyIndex: 0
-  - m_DirtyIndex: 0
-  - m_DirtyIndex: 0
+  - serializedVersion: 1
+    m_DirtyIndex: 0
+  - serializedVersion: 1
+    m_DirtyIndex: 0
+  - serializedVersion: 1
+    m_DirtyIndex: 0
+  - serializedVersion: 1
+    m_DirtyIndex: 0
 --- !u!1 &420221126
 GameObject:
   m_ObjectHideFlags: 0
@@ -1748,7 +1752,6 @@ AudioListener:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 602162720}
   m_Enabled: 1
-  m_ExtensionPropertyValues: []
 --- !u!124 &602162722
 Behaviour:
   m_ObjectHideFlags: 0
@@ -1787,11 +1790,11 @@ Camera:
   m_TargetEye: 3
   m_HDR: 1
   m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
-  m_StereoMirrorMode: 0
 --- !u!4 &602162724
 Transform:
   m_ObjectHideFlags: 0
@@ -1894,7 +1897,7 @@ SpriteRenderer:
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_StitchSeams: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -1937,8 +1940,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a58db1f2f21de404791fca46f608ac7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lastHit: {x: 0, y: 0, z: 0}
-  lastWorldHit: {x: 0, y: 0, z: 0}
   initialVelocity: {x: 2, y: 15}
   tilemapGameObject: {fileID: 154894189}
 --- !u!1 &1589236689

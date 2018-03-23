@@ -45,6 +45,7 @@ public class BaseLevelGenerator : MonoBehaviour {
     protected List<BaseLevelStructure> structureList;
     public IEnumerator GenerateMap()
     {
+        level.dontUpdate = true;
         yield return null;
         _progress = 0;
         var generationtime = UnityEditor.EditorApplication.timeSinceStartup;
@@ -95,9 +96,13 @@ public class BaseLevelGenerator : MonoBehaviour {
         yield return StartCoroutine(Generate(structureList));
         _progress++;
         DebugCheckTimeEnd();
+
+
+        DebugCheckTimeStart("UpdateViews");
+        //level.Save();
+        //level.Load();
         yield return StartCoroutine(level.UpdatePrefabFromData());
         level.GenerateGridFromPrefab();
-        DebugCheckTimeStart("UpdateViews");
         
         _progress++;
         DebugCheckTimeEnd();
@@ -106,6 +111,8 @@ public class BaseLevelGenerator : MonoBehaviour {
         result.AppendLine("Tries: "+ tries);
         UnityEngine.Debug.Log(result.ToString());
         yield return null;
+        level.dontUpdate = false;
+
 
     }
 

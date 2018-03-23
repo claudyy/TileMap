@@ -11,6 +11,8 @@ public class LevelTile {
     public TileLevelData data;
     public BaseTileBehvior behavior;
     public Vector2Int pos;
+
+    public bool needUpdate ;
     public LevelTile()
     {
         data = null;
@@ -22,7 +24,11 @@ public class LevelTile {
         data = null;
         this.pos = pos;
     }
-
+    public LevelTile(Vector3Int pos, TileLevelData data,LevelTilemap level) {
+        tileID = defaultTileID;
+        this.pos = new Vector2Int(pos.x,pos.y);
+        OverrideData(level, data);
+    }
     public void Init(LevelTilemap level)
     {
         if (data == null) {
@@ -31,6 +37,7 @@ public class LevelTile {
             behavior = data.GetBehavior();
             behavior.Init(level,this);
         }
+        needUpdate = true;
     }
     public void UpdateTile(LevelTilemap level)
     {

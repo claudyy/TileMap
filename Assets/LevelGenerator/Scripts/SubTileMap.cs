@@ -17,15 +17,19 @@ public class SubTileMap{
     public TileLevelData[] tilesData;
     //[HideInInspector]
     public int chunkSize;
-    public void Init(LevelTilemap level)
+    public bool wasLoaded;
+    public void Init( LevelTilemap level)
     {
-        for (int x = 0; x < chunkSize; x++)
-        {
-            for (int y = 0; y < chunkSize; y++)
-            {
+        tiles = new LevelTile[chunkSize * chunkSize * chunkSize];
+        for (int x = 0; x < chunkSize; x++) {
+            for (int y = 0; y < chunkSize; y++) {
+                tiles[x + y * chunkSize] = new LevelTile(ToTilePosition(x, y), GetData(x,y),level);
+            }
+        }
+        for (int x = 0; x < chunkSize; x++){
+            for (int y = 0; y < chunkSize; y++){
                 GetTile(x, y).Init(level);
                 level.tilemap.RemoveTileFlags(ToTilePosition(x, y), TileFlags.LockColor);
-
             }
         }
     }
@@ -42,6 +46,8 @@ public class SubTileMap{
 
     }
     public void UpdateTile(int x,int y,LevelTilemap level) {
+        if (GetTile(x, y).needUpdate == false)
+            return;
         if (GetTile(x, y).IsEmpty() == false) {
             if (GetTile(x, y).HaveBehavior()) {
                 if (GetTile(x, y).data.ruleTile != null) {
@@ -62,6 +68,7 @@ public class SubTileMap{
         } else {
             level.tilemap.SetTile(ToTilePosition(x, y), null);
         }
+        GetTile(x, y).needUpdate = false;
     }
     
     public TileLevelData GetDataFromList(string name,TileLevelData[] list) {
@@ -74,9 +81,9 @@ public class SubTileMap{
         return null;
     }
     public Vector3Int ToTilePosition(int x,int y) {
-        return new Vector3Int(chunkSize * posX+ x, chunkSize * posY + y, 0);
+        return new Vector3Int(chunkSize * posX + x, chunkSize * posY + y, 0);
     }
-    public void UpdateTileMap(LevelTilemap level)
+    public void UpdateVisible(LevelTilemap level)
     {
         for (int x = 0; x < chunkSize; x++)
         {
@@ -129,7 +136,7 @@ public class SubTileMap{
         tilesData[y * chunkSize + x] = data;
     }
     public TileLevelData GetData(int x, int y) {
-        return tilesData[y * chunkSize + x];
+        return tilesData[x + y * chunkSize];
     }
     #endregion
 }

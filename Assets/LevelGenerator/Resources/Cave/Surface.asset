@@ -11,19 +11,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 640f7914e539c9541b7b2eda462ea2a4, type: 3}
   m_Name: Surface
   m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes: []
   randomDistanceFromCenter: {x: 0, y: 0}
   size: {x: 0, y: 0}
-  sizeX: 240
-  sizeY: 60
+  sizeX: 500
+  sizeY: 120
   baseTile: {fileID: 11400000, guid: 47e8340952d64b845b8e21b05505ea2a, type: 2}
   border:
     noiseTexture:
