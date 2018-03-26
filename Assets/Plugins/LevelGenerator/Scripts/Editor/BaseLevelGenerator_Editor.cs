@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEditor;
 [CustomEditor(typeof(BaseLevelGenerator),editorForChildClasses:true)]
 public class BaseLevelGenerator_Editor : Editor {
-    public EditorCoroutine ec;
     public Coroutine c;
     public BaseLevelGenerator generator;
     public override void OnInspectorGUI() {
@@ -13,18 +12,13 @@ public class BaseLevelGenerator_Editor : Editor {
          
         DrawDefaultInspector();
 
-        if (GUILayout.Button("Generate") && ec == null) {
+        if (GUILayout.Button("Generate")) {
             //ec = EditorCoroutine.StartCoroutine(generator.GenerateMap());
             //EditorCoroutines.EditorCoroutines.StartCoroutine(generator.GenerateMap(), generator);
             c = generator.StartCoroutine(generator.GenerateMap());
         }
 
-        if (ec!= null && ec.IsDone == true) {
-            //generator.level.UpdatePrefabFromData();
-            //generator.level.GenerateGridFromPrefab();
-            ec = null;
-        }
-        EditorGUI.ProgressBar(EditorGUILayout.GetControlRect(), generator.GetProgress(),"");
+
 
         if (c != null) {
             //if (EditorUtility.DisplayCancelableProgressBar("Generate", "", .5f)) {
@@ -34,6 +28,5 @@ public class BaseLevelGenerator_Editor : Editor {
             //EditorUtility.ClearProgressBar();
         }
     
-        EditorCoroutine.ShowCoroutineProgressBar("test", ec,generator);
     }
 }
