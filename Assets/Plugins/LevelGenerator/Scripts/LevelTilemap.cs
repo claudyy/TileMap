@@ -87,16 +87,18 @@ public class LevelTilemap : MonoBehaviour {
     Coroutine updateVisivleCoroutine;
     private void Start() {
 
-        updateVisivleCoroutine = StartCoroutine(UpdateVisible());
 
     }
-    void InitFromDataName() {
+    void InitChunkFromDataName() {
         for (int x = 0; x < levelChunkX; x++) {
             for (int y = 0; y < levelChunkY; y++) {
                 //GetTileMap(x,y).GenerateDataList(x, y, chunkSize);
                 GetTileMap(x, y).Init(this);
             }
         }
+    }
+    void SetupChunks() {
+        tileMapList = new SubTileMap[levelChunkX * levelChunkY];
     }
     private void Update()
     {
@@ -177,12 +179,21 @@ public class LevelTilemap : MonoBehaviour {
         FileStream stream = new FileStream(Application.dataPath + "/Test.xml", FileMode.Open);
         var st = serializer.Deserialize(stream) as TileMapSaveData;
         stream.Close();
-        Resize(st.sizeX, st.sizeY);
+        Load(st);
+    }
+    public void Load(TileMapSaveData st) {
+        if(updateVisivleCoroutine != null)
+            StopCoroutine(updateVisivleCoroutine);
+
+        Resize(st.sizeX, st.sizeY);//inits chunk
         TileLevelData tile = null;
         //UnityEngine.Debug.Log(sizeX + sizeY * sizeX);
         //UnityEngine.Debug.Log(st.tiles.Length);
         StringBuilder str = new StringBuilder();
         Stopwatch w = new Stopwatch();
+
+        
+
         str.Append("Load Data : ");
         w.Reset();
         w.Start();
@@ -193,13 +204,13 @@ public class LevelTilemap : MonoBehaviour {
                 OverrideDataNameTile(x, y, tile);
             }
         }
-        str.AppendLine(" Duration: "+ w.Elapsed);
+        str.AppendLine(" Duration: " + w.Elapsed);
         //UpdatePrefabFromData();
         //GenerateGridFromPrefab();
         str.Append("Init: ");
         w.Reset();
         w.Start();
-        InitFromDataName();
+        InitChunkFromDataName();
         str.AppendLine(" Duration: " + w.Elapsed);
 
         str.Append("TileMap Cleare : ");
@@ -215,8 +226,9 @@ public class LevelTilemap : MonoBehaviour {
         str.AppendLine(" Duration: " + w.Elapsed);
 
         UnityEngine.Debug.Log(str.ToString());
-    }
+        updateVisivleCoroutine = StartCoroutine(UpdateVisible());
 
+    }
     public void Save() {
        var st =  new TileMapSaveData();
         st.sizeX = sizeX;
@@ -290,10 +302,11 @@ public class LevelTilemap : MonoBehaviour {
     }
 
     internal void Resize(int x, int y) {
-        int chunkX = (int)Math.Round((float)x / chunkSize);
-        int chunkY = (int)Math.Round((float)y / chunkSize);
+        int chunkX = Mathf.CeilToInt((float)x / chunkSize);
+        int chunkY = Mathf.CeilToInt((float)y / chunkSize);
         levelChunkX = chunkX;
         levelChunkY = chunkY;
+        UnityEngine.Debug.Log(x + " : " + chunkX + " / " + chunkSize);
         GenerateTileSets();
     }
 

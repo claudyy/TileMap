@@ -19,53 +19,53 @@ public class BaseRoom : BaseLevelStructure {
     public List<bool> RightDoorPos;
     public int rightDoorCount = 0;
     public int door;
-    public override void Init(BaseLevelStructureData data, LevelTilemap level) {
-        base.Init(data, level);
+    public override void Init(BaseLevelStructureData data) {
+        base.Init(data);
         roomData = data as Structure_BaseRoomData;
         TopDoorPos= new List<bool>(new bool[roomData.sizeX]);
         BottomDoorPos = new List<bool>(new bool[roomData.sizeX]);
         LeftDoorPos = new List<bool>(new bool[roomData.sizeY]);
         RightDoorPos = new List<bool>(new bool[roomData.sizeY]);
     }
-    public override IEnumerator Generate(LevelTilemap level) {
-        base.Generate(level);
+    public override IEnumerator Generate(GeneratorMapData map) {
+        base.Generate(map);
         int startX = posX;
         int startY = posY;
         for (int x = 0; x < roomData.sizeX; x++) {
             for (int y = 0; y < roomData.sizeY; y++) {
                 if(y == 0) {
                     if(BottomDoorPos[x] == true)
-                        level.OverrideDataNameTile(startX + x, startY + y, roomData.floor);
+                        map.OverrideTile(startX + x, startY + y, roomData.floor);
                     else
-                        level.OverrideDataNameTile(startX + x, startY + y, roomData.wall);
+                        map.OverrideTile(startX + x, startY + y, roomData.wall);
 
                     continue;
                 }
                 if (x == 0) {
                     if (LeftDoorPos[y] == true)
-                        level.OverrideDataNameTile(startX + x, startY + y, roomData.floor);
+                        map.OverrideTile(startX + x, startY + y, roomData.floor);
                     else
-                        level.OverrideDataNameTile(startX + x, startY + y, roomData.wall);
+                        map.OverrideTile(startX + x, startY + y, roomData.wall);
 
                     continue;
                 }
                 if (x == roomData.sizeX-1) {
                     if (RightDoorPos[y] == true)
-                        level.OverrideDataNameTile(startX + x, startY + y, roomData.floor);
+                        map.OverrideTile(startX + x, startY + y, roomData.floor);
                     else
-                        level.OverrideDataNameTile(startX + x, startY + y, roomData.wall);
+                        map.OverrideTile(startX + x, startY + y, roomData.wall);
 
                     continue;
                 }
                 if (y == roomData.sizeY - 1) {
                     if (TopDoorPos[x] == true)
-                        level.OverrideDataNameTile(startX + x, startY + y, roomData.floor);
+                        map.OverrideTile(startX + x, startY + y, roomData.floor);
                     else
-                        level.OverrideDataNameTile(startX + x, startY + y, roomData.wall);
+                        map.OverrideTile(startX + x, startY + y, roomData.wall);
 
                     continue;
                 }
-                level.OverrideDataNameTile(startX + x, startY + y, roomData.roomTileList[x * y]);
+                map.OverrideTile(startX + x, startY + y, roomData.roomTileList[x * y]);
                 yield return null;
             }
         }
@@ -135,9 +135,9 @@ public class Structure_BaseRoomData : BaseLevelStructureData {
                 bottomPossibleDoors.Add(false);
         }
     }
-    public override BaseLevelStructure GetStructure(LevelTilemap level) {
+    public override BaseLevelStructure GetStructure() {
         var r = new BaseRoom();
-        r.Init(this,level);
+        r.Init(this);
         return r;
     }
     public void Overwrite(TileLevelData[] tiles) {

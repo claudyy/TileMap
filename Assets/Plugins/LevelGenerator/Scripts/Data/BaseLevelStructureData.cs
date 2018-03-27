@@ -7,7 +7,7 @@ public class BaseLevelStructure{
     protected List<Bounds> boundList;
     public int posX = 0;
     public int posY = 0;
-    public virtual void Init(BaseLevelStructureData data, LevelTilemap level) {
+    public virtual void Init(BaseLevelStructureData data) {
     }
     public bool IntersectWithBound(Bounds bound) {
         for (int i = 0; i < boundList.Count; i++) {
@@ -16,7 +16,7 @@ public class BaseLevelStructure{
         }
         return false;
     }
-    public virtual IEnumerator Generate(LevelTilemap level) {
+    public virtual IEnumerator Generate(GeneratorMapData map) {
         yield return null;
     }
     public virtual void TryGenerate(BaseLevelGenerator generator) {
@@ -65,10 +65,10 @@ public class BaseLevelStructure{
 public class BaseLevelStructureData : ScriptableObject {
 
 
-    public virtual BaseLevelStructure GetStructure(LevelTilemap level) {
+    public virtual BaseLevelStructure GetStructure() {
         return new BaseLevelStructure();
     }
-    public virtual void Generate(Rect rect, LevelTilemap level) {
+    public virtual void Generate(Rect rect, GeneratorMapData map) {
 
     }
     public virtual void Generate(Rect rect,LevelTilemap level,bool[,] canOverwrite)

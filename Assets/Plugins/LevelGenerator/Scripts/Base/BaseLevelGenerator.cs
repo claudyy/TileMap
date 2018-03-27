@@ -1,11 +1,45 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 //using CreativeSpore.SuperTilemapEditor;
 
 using System.Text;
 using System.Diagnostics;
-
+public class GeneratorMapData {
+    public TileLevelData[] tiles;
+    public int sizeX;
+    public int sizeY;
+    public GeneratorMapData(int sizeX, int sizeY,TileLevelData defaultTile) {
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
+        tiles = new TileLevelData[sizeX*sizeY];
+        for (int x = 0; x < sizeX; x++) {
+            for (int y = 0; y < sizeY; y++) {
+                tiles[x + y * sizeX] = defaultTile;
+            }
+        }
+    }
+    public void OverrideTile(int x,int y,TileLevelData data) {
+        tiles[x + y *sizeX] = data;
+    }
+    public TileLevelData GetTile(int x, int y) {
+        return tiles[x + y * sizeX];
+    }
+    public TileMapSaveData GetNewSaveFile() {
+        var file = new TileMapSaveData();
+        file.sizeX = sizeX;
+        file.sizeY = sizeY;
+        List<TileSaveData> saveTiles = new List<TileSaveData>();
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = 0; x < sizeX; x++) {
+                saveTiles.Add(new TileSaveData(GetTile(x, y)));
+            }
+        }
+        file.tiles = saveTiles.ToArray();
+        return file;
+    }
+}
 [RequireComponent(typeof(LevelTilemap))]
 [ExecuteInEditMode()]
 public class BaseLevelGenerator : MonoBehaviour {
@@ -36,9 +70,9 @@ public class BaseLevelGenerator : MonoBehaviour {
     protected virtual bool CheckGeneratedResult(List<BaseLevelStructure> structure) {
         return true;
     }
-    protected virtual IEnumerator Generate(List<BaseLevelStructure> structure) {
+    protected virtual IEnumerator Generate(List<BaseLevelStructure> structure, GeneratorMapData map) {
         for (int i = 0; i < structure.Count; i++) {
-            yield return StartCoroutine(structure[i].Generate(level));
+            yield return StartCoroutine(structure[i].Generate(map));
         }
     }
     //
@@ -82,27 +116,32 @@ public class BaseLevelGenerator : MonoBehaviour {
         for (int i = 0; i < structureList.Count; i++) {
             structureList[i].EncapsulateBound(ref bound);
         }
-        level.Resize((int)bound.max.x + border, (int)bound.max.y + border);
+        int mapSizeX = (int)bound.max.x + border;
+        int mapSizeY = (int)bound.max.y + border;
+        //level.Resize(, (int)bound.max.y + border);
+        var map = new GeneratorMapData(mapSizeX, mapSizeY,defaultTileData);
+
         _progress++;
         DebugCheckTimeEnd();
 
         if (fillWithDefault) {
             DebugCheckTimeStart("Fill Default");
-            FillWithDataName(level,defaultTileData);
+            //FillWithDataName(level,defaultTileData);
             DebugCheckTimeEnd();
         }
 
         DebugCheckTimeStart("Generating");
-        yield return StartCoroutine(Generate(structureList));
+        yield return StartCoroutine(Generate(structureList,map));
         _progress++;
         DebugCheckTimeEnd();
 
 
         DebugCheckTimeStart("UpdateViews");
+        level.Load(map.GetNewSaveFile());
         //level.Save();
         //level.Load();
-        yield return StartCoroutine(level.UpdatePrefabFromData());
-        level.GenerateGridFromPrefab();
+        //yield return StartCoroutine(level.UpdatePrefabFromData());
+        //level.GenerateGridFromPrefab();
         
         _progress++;
         DebugCheckTimeEnd();

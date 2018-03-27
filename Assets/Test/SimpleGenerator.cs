@@ -6,7 +6,7 @@ public class SimpleGenerator : BaseLevelGenerator {
 
     public BaseLevelStructureData structure;
     protected override IEnumerator TryGenerate() {
-        structureList = new List<BaseLevelStructure>(1) { structure.GetStructure(level) };
+        structureList = new List<BaseLevelStructure>(1) { structure.GetStructure() };
         yield return null;
     }
     protected override bool CheckGeneratedResult(List<BaseLevelStructure> structure) {

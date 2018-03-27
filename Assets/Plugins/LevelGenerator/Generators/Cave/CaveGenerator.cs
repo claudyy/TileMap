@@ -14,7 +14,7 @@ public class CaveGenerator : BaseLevelGenerator {
             yield return null;
         }
         for (int i = 0; i < bioms.Count; i++) {
-            var b = bioms[i].GetStructure(level);
+            var b = bioms[i].GetStructure();
             lastY += bioms[i].sizeY;
             b.posY = totalY - lastY;
             sTemp.Add(b);

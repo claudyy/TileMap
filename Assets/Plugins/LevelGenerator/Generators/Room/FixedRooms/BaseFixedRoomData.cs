@@ -14,8 +14,8 @@ public class BaseFixedRoom : BaseRoom{
     public bool IsEmpty() {
         return roomData == null;
     }
-    public override void Init(BaseLevelStructureData data, LevelTilemap level) {
-        base.Init(data, level);
+    public override void Init(BaseLevelStructureData data) {
+        base.Init(data);
     }
     public int fixedX;
     public int fixedY;
@@ -55,7 +55,7 @@ public class BaseFixedRoom : BaseRoom{
 }
 public class BaseFixedRoomData : Structure_BaseRoomData {
 
-    public override BaseLevelStructure GetStructure(LevelTilemap level) {
+    public override BaseLevelStructure GetStructure() {
         return new BaseFixedRoom();
     }
     

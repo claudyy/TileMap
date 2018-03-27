@@ -45,7 +45,7 @@ public class FixedRoomGenerator : BaseLevelGenerator {
 
         //placeExit
         DebugCheckTimeStart("Place Exit");
-        var exit = GetRandomRoomFromList(roomExitDataList).GetStructure(level) as FixedRoom_Exit;
+        var exit = GetRandomRoomFromList(roomExitDataList).GetStructure() as FixedRoom_Exit;
         var exitPos = GetRandomRoomPos();
         SetFixedRoom(exit,exitPos.x,exitPos.y);
         if (exitPos == Vector2Int.one * -1 || exit == null) {
@@ -58,7 +58,7 @@ public class FixedRoomGenerator : BaseLevelGenerator {
         //ChestRoom
         DebugCheckTimeStart("Place Chest");
 
-        var chest = GetRandomRoomFromList(roomChestDataList).GetStructure(level) as FixedRoom_Chest;
+        var chest = GetRandomRoomFromList(roomChestDataList).GetStructure() as FixedRoom_Chest;
         var chestPos = GetRandomFreeRoomPos((int)new Vector2(levelSizeX,levelSizeY).magnitude/3,exit);
         if (chestPos == Vector2Int.one * -1 || chest == null) {
             DebugTryFail(chest == null ? "Couldnt find Chest Room" : "Could find Position for chest");
@@ -72,7 +72,7 @@ public class FixedRoomGenerator : BaseLevelGenerator {
         //PlaceShop
         DebugCheckTimeStart("Place Shop");
 
-        var shop = GetRandomRoomFromList(roomShopDataList).GetStructure(level) as FixedRoom_Shop;
+        var shop = GetRandomRoomFromList(roomShopDataList).GetStructure() as FixedRoom_Shop;
         var shopPos = GetRandomFreeRoomPos((int)new Vector2(levelSizeX, levelSizeY).magnitude / 3, chest,exit);
         if (shopPos == Vector2Int.one * -1 || shop == null) {
             DebugTryFail(exit == null ? "Couldnt find Shop Room" : "Could find Position for shop");
@@ -116,7 +116,7 @@ public class FixedRoomGenerator : BaseLevelGenerator {
         //Place Entry
         DebugCheckTimeStart("Place Entry");
 
-        var entry = GetRandomRoomFromList(roomEntryDataList).GetStructure(level) as FixedRoom_Entry;
+        var entry = GetRandomRoomFromList(roomEntryDataList).GetStructure() as FixedRoom_Entry;
         var entryPos = FindEntryPos(exit, (int)new Vector2(levelSizeX, levelSizeY).magnitude / 3);
         if (entryPos == Vector2Int.one * -1 || entry == null) {
             DebugTryFail(entry == null ? "Couldnt find Entry Room" : "Could find Position for Entry");
@@ -234,7 +234,7 @@ public class FixedRoomGenerator : BaseLevelGenerator {
     }
     BaseFixedRoom GetStandartRoom(int targetPosX, int targetPosY) {
         var roomData = RemoveDataThatHasNotTheRightDoors(roomStandartDataList.Cast<BaseFixedRoomData>().ToList(), targetPosX, targetPosY);
-        return GetRandomRoomFromList(roomData).GetStructure(level) as BaseFixedRoom;
+        return GetRandomRoomFromList(roomData).GetStructure() as BaseFixedRoom;
     }
     List<BaseFixedRoomData> RemoveDataThatHasNotTheRightDoors(List<BaseFixedRoomData> list, int targetX, int targetY) {
         var top = IsFreePos(targetX, targetY + 1) ? null : GetRoom(targetX, targetY+1).roomData;

@@ -120,11 +120,11 @@ public class BiomPlantInfo{
 }
 public class BiomStructure : BaseLevelStructure {
     public BiomData biomData;
-    public override void Init(BaseLevelStructureData data, LevelTilemap level) {
-        base.Init(data, level);
+    public override void Init(BaseLevelStructureData data) {
+        base.Init(data);
         biomData = data as BiomData;
     }
-    public override IEnumerator Generate(LevelTilemap level) {
+    public override IEnumerator Generate(GeneratorMapData map) {
         int startX = posX;
         int startY = posY;
 
@@ -159,7 +159,7 @@ public class BiomStructure : BaseLevelStructure {
                 }
                 
                 //level.OverrideTile(startX + x, startY + y, tile);
-                level.OverrideDataNameTile(startX + x, startY + y, tile);
+                map.OverrideTile(startX + x, startY + y, tile);
             }
         }
         //ores
@@ -172,12 +172,12 @@ public class BiomStructure : BaseLevelStructure {
                 if (InBorder(x, y, borderRndList))
                     continue;
                 int size = Random.Range(ore.depositSize.x, ore.depositSize.y);
-                var positionList = GetOreDepositPositions(size, startX + x, startY + y,level);
+                var positionList = GetOreDepositPositions(size, startX + x, startY + y,map);
                 for (int s = 0; s < size; s++) {
                     if (positionList.Count == 0)
                         break;
                     int randomIndex = Random.Range(0, positionList.Count);
-                    level.OverrideDataNameTile(positionList[s].x, positionList[s].y, ore.data);
+                    map.OverrideTile(positionList[s].x, positionList[s].y, ore.data);
                     //positionList.RemoveAt(randomIndex);
                 }
 
@@ -219,7 +219,7 @@ public class BiomStructure : BaseLevelStructure {
             return true;
         return false;
     }
-    List<Vector2Int> GetOreDepositPositions(int size, int startX, int startY, LevelTilemap level) {
+    List<Vector2Int> GetOreDepositPositions(int size, int startX, int startY, GeneratorMapData map) {
         var list = new List<Vector2Int>();
         list.Add(new Vector2Int(startX, startY));
         for (int i = 1; i <= 1 + size / 7; i++) {
@@ -232,10 +232,10 @@ public class BiomStructure : BaseLevelStructure {
             list.Add(new Vector2Int(startX, startY - i));
             list.Add(new Vector2Int(startX + i, startY - i));
         }
-        RemoveOutOfBoundFromList(list,level);
+        RemoveOutOfBoundFromList(list);
         return list;
     }
-    public void RemoveOutOfBoundFromList(List<Vector2Int> list,LevelTilemap level) {
+    public void RemoveOutOfBoundFromList(List<Vector2Int> list) {
         for (int i = list.Count - 1; i >= 0; i--) {
             if (InBound(new Vector3(list[i].x, list[i].y)) == false)
                 list.RemoveAt(i);
@@ -275,9 +275,9 @@ public class BiomData : BaseLevelStructureData {
 	public Rect GetRect(Vector2Int pos){
 		return new Rect(pos.x -(float)size.x/2, pos.y-(float)size.y/2, size.x, size.y);
 	}
-    public override BaseLevelStructure GetStructure(LevelTilemap level) {
+    public override BaseLevelStructure GetStructure() {
         var s = new BiomStructure();
-        s.Init(this,level);
+        s.Init(this);
         return s;
     }
     public void Generate(LevelTilemap level,Vector2Int startPos)
