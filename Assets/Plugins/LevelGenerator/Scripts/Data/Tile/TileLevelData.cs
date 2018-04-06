@@ -8,6 +8,8 @@ public class BaseTileBehvior
 {
     float lastUpdateTime = 0;
     public float deltaTime;
+    float inViewlastUpdateTime = 0;
+    public float inViewdeltaTime;
     public virtual void Init(LevelTilemap level, LevelTile tile)
     {
     }
@@ -15,6 +17,10 @@ public class BaseTileBehvior
     {
         deltaTime = Time.time - lastUpdateTime;
         lastUpdateTime = Time.time;
+    }
+    public virtual void UpdateInView(LevelTilemap level, LevelTile tile) {
+        inViewdeltaTime = Time.time - inViewlastUpdateTime;
+        inViewlastUpdateTime = Time.time;
     }
     public virtual Tile GetTile(LevelTile tile, LevelTilemap level) {
         return tile.data.GetTile();
@@ -29,6 +35,20 @@ public class BaseTileBehvior
     }
     public virtual void OnErase(LevelTile levelTile, LevelTilemap level) {
 
+    }
+
+    public virtual bool NeedUpdate() {
+        return false;
+    }
+
+    public virtual bool NeedUpdateView() {
+        return false;
+    }
+
+    public virtual void OnRemove() {
+    }
+
+    public virtual void OnDamage(LevelTilemap level, TileDamageType type, int damage) {
     }
 }
 [CreateAssetMenu(menuName ="Data/LevelGeneration/TileData")]

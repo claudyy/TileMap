@@ -20,9 +20,13 @@ public class TileBehavior_Liquid : BaseTileBehvior {
     public bool IsFull() {
         return liquidAmount >= data.maxWater;
     }
-    public override void Update(LevelTilemap level, LevelTile tile) {
-        base.Update(level, tile);
-        curDelay -= deltaTime;
+    public override bool NeedUpdateView() {
+        return true;
+    }
+
+    public override void UpdateInView(LevelTilemap level, LevelTile tile) {
+        base.UpdateInView(level, tile);
+        curDelay -= inViewdeltaTime;
 
         if (DelayErase(level, tile))
             return;
@@ -47,7 +51,7 @@ public class TileBehavior_Liquid : BaseTileBehvior {
         }
         if (erase == false)
             return false;
-        delayedErase -= deltaTime;
+        delayedErase -= inViewdeltaTime;
         if (delayedErase >= 0)
             return false;
         

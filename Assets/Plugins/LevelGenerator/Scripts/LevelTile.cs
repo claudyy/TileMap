@@ -39,12 +39,15 @@ public class LevelTile {
         }
         needUpdate = true;
     }
-    public void UpdateTile(LevelTilemap level)
+    public void UpdateBehaviorTile(LevelTilemap level)
     {
         if(behavior != null)
             behavior.Update(level,this);
     }
-    
+    public void UpdateBehaviorInViewTile(LevelTilemap level) {
+        if (behavior != null)
+            behavior.UpdateInView(level, this);
+    }
 
     public bool IsEmpty()
     {
@@ -77,13 +80,38 @@ public class LevelTile {
     public bool HaveBehavior() {
         return behavior != null;
     }
-
+    public bool HaveBehaviorViewUpdate() {
+        if (HaveBehavior() == false)
+            return false;
+        return behavior.NeedUpdateView();
+    }
+    public bool HaveBehaviorUpdate() {
+        if (HaveBehavior() == false)
+            return false;
+        return behavior.NeedUpdate();
+    }
     public bool OverrideColor(LevelTilemap level) {
         if (HaveBehavior() == false)
             return false;
         return behavior.OverrideColor(this,level);
     }
-
+    public virtual void ApplyDamage(LevelTilemap level,TileDamageType type, int damage) {
+        if (HaveBehavior())
+            behavior.OnDamage(level, type, damage);
+        if (health > damage) {
+            health -= damage;
+            return;
+        }
+        Destroy(level);
+    }
+    public virtual void Destroy(LevelTilemap level) {
+        level.DestroyWall(new Vector2Int((int)pos.x, (int)pos.y));
+        Remove();
+    }
+    public virtual void Remove() {
+        if (HaveBehavior())
+            behavior.OnRemove();
+    }
     public Color GetColor(LevelTilemap level) {
         if (HaveBehavior() == false)
             return Color.white;

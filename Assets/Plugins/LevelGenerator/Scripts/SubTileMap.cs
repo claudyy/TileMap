@@ -15,6 +15,9 @@ public class SubTileMap{
     //[HideInInspector]
     public LevelTile[] tiles;
     public TileLevelData[] tilesData;
+    public List<LevelTile> updateTilesInView = new List<LevelTile>();
+    public List<LevelTile> updateTiles = new List<LevelTile>();
+
     //[HideInInspector]
     public int chunkSize;
     public bool wasLoaded;
@@ -83,17 +86,35 @@ public class SubTileMap{
     public Vector3Int ToTilePosition(int x,int y) {
         return new Vector3Int(chunkSize * posX + x, chunkSize * posY + y, 0);
     }
-    public void UpdateVisible(LevelTilemap level)
+    public void UpdateInView(LevelTilemap level)
     {
+        for (int i = 0; i < updateTilesInView.Count; i++) {
+            updateTilesInView[i].UpdateBehaviorInViewTile(level);
+        }
+        UpdateViewChunke(level);
+        return;
         for (int x = 0; x < chunkSize; x++)
         {
             for (int y = 0; y < chunkSize; y++)
             {
                 if(GetTile(x, y).IsEmpty() == false)
-                    GetTile(x, y).UpdateTile(level);
+                    GetTile(x, y).UpdateBehaviorInViewTile(level);
             }
         }
-        UpdateViewChunke(level);
+    }
+    public void Update(LevelTilemap level) {
+
+
+        for (int i = 0; i < updateTiles.Count; i++) {
+            updateTiles[i].UpdateBehaviorTile(level);
+        }
+        return;
+        for (int x = 0; x < chunkSize; x++) {
+            for (int y = 0; y < chunkSize; y++) {
+                if (GetTile(x, y).IsEmpty() == false)
+                    GetTile(x, y).UpdateBehaviorTile(level);
+            }
+        }
     }
     public void Hide()
     {
@@ -101,15 +122,30 @@ public class SubTileMap{
     }
     public void Erase(Vector3Int pos, LevelTilemap level)
     {
+        RemoveTile(pos.x, pos.y);
         GetTile(pos.x, pos.y).OverrideData(level,null);
         UpdateTile(pos.x, pos.y, level);
 
     }
     public void OverrideTile(int x, int y, LevelTilemap level, TileLevelData data) {
-        GetTile(x, y).OverrideData(level,data);
+        RemoveTile(x, y);
+        var tile = GetTile(x, y);
+        tile.OverrideData(level,data);
+        if (tile.HaveBehaviorUpdate())
+            updateTiles.Add(tile);
+        if (tile.HaveBehaviorViewUpdate())
+            updateTilesInView.Add(tile);
+
         UpdateTile(x, y, level);
     }
-    
+    void RemoveTile(int x, int y) {
+        var tile = GetTile(x, y);
+        tile.Remove();
+        if (tile.HaveBehaviorUpdate())
+            updateTiles.Remove(tile);
+        if (tile.HaveBehaviorViewUpdate())
+            updateTilesInView.Remove(tile);
+    }
     public LevelTile GetTile(int x, int y)
     {
         return tiles[y * chunkSize + x];
