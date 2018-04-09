@@ -97,7 +97,11 @@ public class LevelTile {
     }
     public virtual void ApplyDamage(LevelTilemap level,TileDamageType type, int damage) {
         if (HaveBehavior())
-            behavior.OnDamage(level, type, damage);
+            behavior.OnDamage(this,level, type, damage);
+        if (health == -1)
+            return;
+        if (data == null || data.type != type)
+            return;
         if (health > damage) {
             health -= damage;
             return;
@@ -105,12 +109,14 @@ public class LevelTile {
         Destroy(level);
     }
     public virtual void Destroy(LevelTilemap level) {
-        level.DestroyWall(new Vector2Int((int)pos.x, (int)pos.y));
-        Remove();
-    }
-    public virtual void Remove() {
         if (HaveBehavior())
-            behavior.OnRemove();
+            behavior.OnDestry(this, level);
+        Remove(level);
+        level.DestroyWall(new Vector2Int((int)pos.x, (int)pos.y));
+    }
+    public virtual void Remove(LevelTilemap level) {
+        if (HaveBehavior())
+            behavior.OnRemove(this,level);
     }
     public Color GetColor(LevelTilemap level) {
         if (HaveBehavior() == false)

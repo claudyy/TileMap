@@ -186,31 +186,40 @@ public class BiomStructure : BaseLevelStructure {
 
         //structures
         ////Plants
-        //List<Vector2Int>[] lastPlantPos = new List<Vector2Int>[plants.Count];
-        //for (int i = 0; i < lastPlantPos.Length; i++) {
-        //	lastPlantPos[i] = new List<Vector2Int> ();
-        //}
-        //for (int x = 0; x < level.sizeX; x++) {
-        //	for (int y = 0; y < level.sizeY; y++) {
-        //		for (int i = 0; i < plants.Count; i++) {
-        //			Vector2Int pos = new Vector2Int(x, y);
-        //			if (OutOfMinDisOfAlreadyUsed(lastPlantPos[i],pos,plants[i].minDistance) == false)
-        //				continue;
-        //			if (plants[i].placeOnWall && level.IsOnWall(x, y) == false)
-        //				continue;
-        //			
-        //			lastPlantPos[i].Add(pos);
-        //			break;
-        //		}
-        //	}
-        //}
-        //for (int i = 0; i < plants.Count; i++) {
-        //	for (int p = 0; p < lastPlantPos[i].Count; p++) {
-        //		level.OverrideTile(lastPlantPos[i][p], plants[i].tile);
-        //	}
-        //}
+        List<Vector2Int>[] lastPlantPos = new List<Vector2Int>[biomData.plants.Count];
+        for (int i = 0; i < lastPlantPos.Length; i++) {
+        	lastPlantPos[i] = new List<Vector2Int> ();
+        }
+        for (int x = 0; x < map.sizeX; x++) {
+        	for (int y = 0; y < map.sizeY; y++) {
+        		for (int i = 0; i < biomData.plants.Count; i++) {
+        			Vector2Int pos = new Vector2Int(x, y);
+        			if (OutOfMinDisOfAlreadyUsed(lastPlantPos[i],pos, biomData.plants[i].minDistance) == false)
+        				continue;
+                    if (map.IsEmpty(x, y) == false)
+                        continue;
+                    if (biomData.plants[i].placeOnWall && map.IsOnWall(x, y) == false)
+        				continue;
+        			
+        			lastPlantPos[i].Add(pos);
+        			break;
+        		}
+        	}
+        }
+        for (int i = 0; i < biomData.plants.Count; i++) {
+        	for (int p = 0; p < lastPlantPos[i].Count; p++) {
+                map.OverrideTile(lastPlantPos[i][p].x, lastPlantPos[i][p].y, biomData.plants[i].tile);
+        	}
+        }
         yield return null;
 
+    }
+    bool OutOfMinDisOfAlreadyUsed(List<Vector2Int> alreadyUsePos, Vector2Int pos, float minDistance) {
+        for (int i = 0; i < alreadyUsePos.Count; i++) {
+            if (Vector2Int.Distance(pos, alreadyUsePos[i]) < minDistance)
+                return false;
+        }
+        return true;
     }
     public bool InBorder(int x,int y,List<float> rndList) {
         if (biomData.border.noiseTexture.Count == 0)

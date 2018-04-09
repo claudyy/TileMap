@@ -6,6 +6,8 @@ using UnityEngine;
 
 using System.Text;
 using System.Diagnostics;
+using System;
+
 public class GeneratorMapData {
     public TileLevelData[] tiles;
     public int sizeX;
@@ -38,6 +40,39 @@ public class GeneratorMapData {
         }
         file.tiles = saveTiles.ToArray();
         return file;
+    }
+
+    public bool IsOnWall(int x, int y) {
+
+        if (IsOnHorizontalWall(x, y) == true || IsOnVerticalWall(x, y) == true)
+            return true;
+
+        return false;
+    }
+    public bool IsOnHorizontalWall(int x, int y) {
+        if (IsEmpty(x, y) == false)
+            return false;
+        if (IsEmpty(x - 1, y) == IsEmpty(x + 1, y))
+            return false;
+        return true;
+    }
+    public bool IsOnVerticalWall(int x, int y) {
+        if (IsEmpty(x, y) == false)
+            return false;
+        if (IsEmpty(x, y - 1) == IsEmpty(x, y + 1))
+            return false;
+        return true;
+    }
+
+    public bool IsEmpty(int x, int y) {
+        if (OutOfBound(x, y))
+            return false;
+        if (GetTile(x, y) == null)
+            return true;
+        return GetTile(x, y).tile == null;
+    }
+    public bool OutOfBound(int x, int y) {
+        return x >= sizeX || y >= sizeY || x < 0 || y < 0;
     }
 }
 [RequireComponent(typeof(LevelTilemap))]
@@ -236,14 +271,14 @@ public class BaseLevelGenerator : MonoBehaviour {
     }
     LevelTile GetEmptyTile()
     {
-        int x = Random.Range(0, level.sizeX);
-        int y = Random.Range(0, level.sizeY);
+        int x = UnityEngine.Random.Range(0, level.sizeX);
+        int y = UnityEngine.Random.Range(0, level.sizeY);
         for (int i = 0; i < 1000; i++)
         {
             if (level.GetTile(x, y).data.tile == null)
                 return level.GetTile(x, y);
-            x = Random.Range(0, level.sizeX);
-            y = Random.Range(0, level.sizeY);
+            x = UnityEngine.Random.Range(0, level.sizeX);
+            y = UnityEngine.Random.Range(0, level.sizeY);
         }
         return null;
     }

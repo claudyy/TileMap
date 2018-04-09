@@ -84,7 +84,8 @@ public class LevelTilemap : MonoBehaviour {
         }
 
     }
-    Coroutine updateVisivleCoroutine;
+    Coroutine updateVisibleCoroutine;
+    Coroutine updateAllCoroutine;
     private void Start() {
 
 
@@ -124,11 +125,18 @@ public class LevelTilemap : MonoBehaviour {
             }
         }
             
-        GetTileMap(updateX, updateY).UpdateVisible(this);
+        GetTileMap(updateX, updateY).UpdateInView(this);
 
     }
     IEnumerator UpdateAllTiles() {
-        yield return null;
+        for (int x = 0; x < levelChunkX; x++) {
+            for (int y = 0; y < levelChunkY; y++) {
+                GetTileMap(x, y).Update(this);
+                yield return new WaitForSeconds(updateRate);
+            }
+        }
+        updateAllCoroutine = StartCoroutine(UpdateAllTiles());
+
     }
     IEnumerator UpdateVisible() {
         Vector3Int midChunk = PosToChunk((int)Camera.main.transform.position.x, (int)Camera.main.transform.position.y);
@@ -138,12 +146,12 @@ public class LevelTilemap : MonoBehaviour {
         int toY = Mathf.Clamp(midChunk.y + 1,0, levelChunkY - 1);
         for (int x = fromX; x <= toX; x++) {
             for (int y = fromY; y <= toY; y++) {
-                GetTileMap(x, y).UpdateVisible(this);
+                GetTileMap(x, y).UpdateInView(this);
                 //UnityEngine.Debug.Log("Update");
             }
         }
         yield return null;
-        updateVisivleCoroutine = StartCoroutine(UpdateVisible());
+        updateVisibleCoroutine = StartCoroutine(UpdateVisible());
     }
     public IEnumerator UpdatePrefabFromData() {
         var tileMap = tilemapPrefab.GetComponentInChildren<Tilemap>();
@@ -182,8 +190,8 @@ public class LevelTilemap : MonoBehaviour {
         Load(st);
     }
     public void Load(TileMapSaveData st) {
-        if(updateVisivleCoroutine != null)
-            StopCoroutine(updateVisivleCoroutine);
+        if(updateVisibleCoroutine != null)
+            StopCoroutine(updateVisibleCoroutine);
 
         Resize(st.sizeX, st.sizeY);//inits chunk
         TileLevelData tile = null;
@@ -226,7 +234,8 @@ public class LevelTilemap : MonoBehaviour {
         str.AppendLine(" Duration: " + w.Elapsed);
 
         UnityEngine.Debug.Log(str.ToString());
-        updateVisivleCoroutine = StartCoroutine(UpdateVisible());
+        updateVisibleCoroutine = StartCoroutine(UpdateVisible());
+        updateAllCoroutine = StartCoroutine(UpdateAllTiles());
 
     }
     public void Save() {
@@ -385,13 +394,7 @@ public class LevelTilemap : MonoBehaviour {
         if (IsPosOutOfBound(pos.x,pos.y))
             return;
         var tile = GetTile(pos);
-        int health = tile.health;
-        if (health > damage)
-        {
-            tile.health -= damage;
-            return;
-        }
-        DestroyWall(new Vector2Int((int)pos.x, (int)pos.y));
+        tile.ApplyDamage(this, type, damage);
     }
     public void DestroyWall(Vector2Int pos)
     {

@@ -45,9 +45,11 @@ public class BaseTileBehvior
         return false;
     }
 
-    public virtual void OnRemove() {
+    public virtual void OnRemove(LevelTile levelTile, LevelTilemap level) {
     }
+    public virtual void OnDestry(LevelTile levelTile, LevelTilemap level) {
 
+    }
     public virtual void OnDamage(LevelTilemap level, TileDamageType type, int damage) {
     }
 }

@@ -45,7 +45,10 @@ MonoBehaviour:
   borderBlend: 0.5
   wallData: []
   structure: []
-  plants: []
+  plants:
+  - minDistance: 4
+    tile: {fileID: 11400000, guid: 581aa8d3dc57985438521d0c3fa71fba, type: 2}
+    placeOnWall: 1
   oreList:
   - data: {fileID: 11400000, guid: f8226c26fce752b4c96cf11d19db2714, type: 2}
     depositSize: {x: 3, y: 7}
