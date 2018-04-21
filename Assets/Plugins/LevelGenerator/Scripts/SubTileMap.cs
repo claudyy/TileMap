@@ -13,65 +13,51 @@ public class SubTileMap{
     public int posY;
     //[SerializeField]
     //[HideInInspector]
-    public LevelTile[] tiles;
+    public BaseTile[] tiles;
     public TileLevelData[] tilesData;
-    public List<LevelTile> updateTilesInView = new List<LevelTile>();
-    public List<LevelTile> updateTiles = new List<LevelTile>();
+    public List<BaseTile> updateTilesInView = new List<BaseTile>();
+    public List<BaseTile> updateTiles = new List<BaseTile>();
 
     //[HideInInspector]
     public int chunkSize;
-    public bool wasLoaded;
-    public void Init( LevelTilemap level)
+    public bool isLoaded;
+    public void Init(LevelTilemap level)
     {
-        tiles = new LevelTile[chunkSize * chunkSize * chunkSize];
+        isLoaded = false;
+        tiles = new BaseTile[chunkSize * chunkSize * chunkSize];
         for (int x = 0; x < chunkSize; x++) {
             for (int y = 0; y < chunkSize; y++) {
-                tiles[x + y * chunkSize] = new LevelTile(ToTilePosition(x, y), GetData(x,y),level);
+                tiles[x + y * chunkSize] = level.CreateTile(ToTilePosition(x, y), GetData(x, y));// new LevelTile(ToTilePosition(x, y), GetData(x,y),level);
             }
         }
         for (int x = 0; x < chunkSize; x++){
             for (int y = 0; y < chunkSize; y++){
-                GetTile(x, y).Init(level);
-                level.tilemap.RemoveTileFlags(ToTilePosition(x, y), TileFlags.LockColor);
+                var tile = GetTile(x, y);
+                tile.Init(level);
+                //level.tilemap.RemoveTileFlags(ToTilePosition(x, y), TileFlags.LockColor);
+                if (tile.HaveBehaviorUpdate())
+                    updateTiles.Add(tile);
+                if (tile.HaveBehaviorViewUpdate())
+                    updateTilesInView.Add(tile);
+                level.InitTile(tile);
             }
         }
     }
     
-    public void UpdateViewChunke(LevelTilemap level)
+    public IEnumerator UpdateViewChunke(LevelTilemap level)
     {
-        for (int x = 0; x < chunkSize; x++)
+        for (int y = 0; y < chunkSize; y++)
         {
-            for (int y = 0; y < chunkSize; y++)
+            for (int x = 0; x < chunkSize; x++)
             {
-                UpdateTile(x, y, level);
+                level.UpdateTile(GetTile(x, y));
             }
+            yield return null;
         }
 
     }
-    public void UpdateTile(int x,int y,LevelTilemap level) {
-        if (GetTile(x, y).needUpdate == false)
-            return;
-        if (GetTile(x, y).IsEmpty() == false) {
-            if (GetTile(x, y).HaveBehavior()) {
-                if (GetTile(x, y).data.ruleTile != null) {
-                    level.tilemap.SetTile(ToTilePosition(x, y), GetTile(x, y).data.ruleTile);
-                } else {
-                    level.tilemap.SetTile(ToTilePosition(x, y), GetTile(x, y).behavior.GetTile(GetTile(x, y), level));
-                }
-            } else {
-                level.tilemap.SetTile(ToTilePosition(x, y), GetTile(x, y).data.GetTile());
-            }
-            if (GetTile(x, y).OverrideColor(level)) {
-                Color c = GetTile(x, y).GetColor(level);
-                level.tilemap.RemoveTileFlags(ToTilePosition(x, y), TileFlags.LockColor);
-                level.tilemap.SetColor(ToTilePosition(x, y), c);
-
-            }
-
-        } else {
-            level.tilemap.SetTile(ToTilePosition(x, y), null);
-        }
-        GetTile(x, y).needUpdate = false;
+    public void UpdateTile(int x,int y, LevelTilemap level) {
+        
     }
     
     public TileLevelData GetDataFromList(string name,TileLevelData[] list) {
@@ -91,16 +77,7 @@ public class SubTileMap{
         for (int i = 0; i < updateTilesInView.Count; i++) {
             updateTilesInView[i].UpdateBehaviorInViewTile(level);
         }
-        UpdateViewChunke(level);
-        return;
-        for (int x = 0; x < chunkSize; x++)
-        {
-            for (int y = 0; y < chunkSize; y++)
-            {
-                if(GetTile(x, y).IsEmpty() == false)
-                    GetTile(x, y).UpdateBehaviorInViewTile(level);
-            }
-        }
+        level.LoadChunk(UpdateViewChunke(level));
     }
     public void Update(LevelTilemap level) {
 
@@ -109,12 +86,6 @@ public class SubTileMap{
             updateTiles[i].UpdateBehaviorTile(level);
         }
         return;
-        for (int x = 0; x < chunkSize; x++) {
-            for (int y = 0; y < chunkSize; y++) {
-                if (GetTile(x, y).IsEmpty() == false)
-                    GetTile(x, y).UpdateBehaviorTile(level);
-            }
-        }
     }
     public void Hide()
     {
@@ -122,31 +93,31 @@ public class SubTileMap{
     }
     public void Erase(Vector3Int pos, LevelTilemap level)
     {
-        RemoveTile(pos.x, pos.y);
+        RemoveTile(level,pos.x, pos.y);
         GetTile(pos.x, pos.y).OverrideData(level,null);
+        level.DestroyTile(GetTile(pos.x, pos.y));
         UpdateTile(pos.x, pos.y, level);
-
     }
     public void OverrideTile(int x, int y, LevelTilemap level, TileLevelData data) {
-        RemoveTile(x, y);
+        RemoveTile(level,x, y);
         var tile = GetTile(x, y);
         tile.OverrideData(level,data);
         if (tile.HaveBehaviorUpdate())
             updateTiles.Add(tile);
         if (tile.HaveBehaviorViewUpdate())
             updateTilesInView.Add(tile);
-
+        level.OverrideTile(tile);
         UpdateTile(x, y, level);
     }
-    void RemoveTile(int x, int y) {
+    void RemoveTile(LevelTilemap level, int x, int y) {
         var tile = GetTile(x, y);
-        //tile.Remove();
+        tile.Remove(level);
         if (tile.HaveBehaviorUpdate())
             updateTiles.Remove(tile);
         if (tile.HaveBehaviorViewUpdate())
             updateTilesInView.Remove(tile);
     }
-    public LevelTile GetTile(int x, int y)
+    public BaseTile GetTile(int x, int y)
     {
         return tiles[y * chunkSize + x];
     }
@@ -173,6 +144,14 @@ public class SubTileMap{
     }
     public TileLevelData GetData(int x, int y) {
         return tilesData[x + y * chunkSize];
+    }
+
+    public virtual void ChangedTile(int x, int y) {
+        var tile = GetTile(x, y);
+        if (tile.HaveBehaviorUpdate())
+            updateTiles.Add(tile);
+        if (tile.HaveBehaviorViewUpdate())
+            updateTilesInView.Add(tile);
     }
     #endregion
 }

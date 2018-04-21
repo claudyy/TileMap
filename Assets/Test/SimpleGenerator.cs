@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SimpleGenerator : BaseLevelGenerator {
-
+    /*
     public BaseLevelStructureData structure;
     protected override IEnumerator TryGenerate() {
         structureList = new List<BaseLevelStructure>(1) { structure.GetStructure() };
@@ -12,5 +12,5 @@ public class SimpleGenerator : BaseLevelGenerator {
     protected override bool CheckGeneratedResult(List<BaseLevelStructure> structure) {
         return true;
     }
-
+    */
 }

@@ -75,9 +75,9 @@ public class GeneratorMapData {
         return x >= sizeX || y >= sizeY || x < 0 || y < 0;
     }
 }
-[RequireComponent(typeof(LevelTilemap))]
 [ExecuteInEditMode()]
 public class BaseLevelGenerator : MonoBehaviour {
+    /*
     public TileLevelData defaultTileData;
     public LevelTilemap level;
     public StringBuilder result;
@@ -117,7 +117,6 @@ public class BaseLevelGenerator : MonoBehaviour {
         level.dontUpdate = true;
         yield return null;
         _progress = 0;
-        var generationtime = UnityEditor.EditorApplication.timeSinceStartup;
         stopwatch = new Stopwatch();
         Stopwatch GenerationStopwatch = new Stopwatch();
         GenerationStopwatch.Start();
@@ -209,23 +208,23 @@ public class BaseLevelGenerator : MonoBehaviour {
         return y;
     }
     public void DebugCheckTimeStart(string name) {
-        time = UnityEditor.EditorApplication.timeSinceStartup;
+
         stopwatch.Reset();
         stopwatch.Start();
         result.Append("Start Generating: " + name);
     }
     public void DebugCheckTimeEnd() {
-        time -= UnityEditor.EditorApplication.timeSinceStartup;
+
         stopwatch.Stop();
         result.AppendLine("Duration: " + stopwatch.Elapsed.Seconds +": "+ stopwatch.Elapsed.Milliseconds);
     }
     public void DebugTryFail(string name) {
         result.AppendLine("Fail Because: " + name);
     }
-    public void FillWithDefault(LevelTilemap level) {
+    public void FillWithDefault(ITileMap level) {
         FillWithTile(level, defaultTileData);
     }
-    public void FillWithTile(LevelTilemap level,TileLevelData data) {
+    public void FillWithTile(ITileMap level,TileLevelData data) {
         for (int x = 0; x < level.sizeX; x++)
         {
             for (int y = 0; y < level.sizeY; y++)
@@ -234,7 +233,7 @@ public class BaseLevelGenerator : MonoBehaviour {
             }
         }
     }
-    public void FillWithDataName(LevelTilemap level, TileLevelData data) {
+    public void FillWithDataName(ITileMap level, TileLevelData data) {
         for (int x = 0; x < level.sizeX; x++) {
             for (int y = 0; y < level.sizeY; y++) {
                 level.OverrideDataNameTile(x,y,data);
@@ -269,7 +268,7 @@ public class BaseLevelGenerator : MonoBehaviour {
         //if (target != null)
             //target.OverrideData(plant);
     }
-    LevelTile GetEmptyTile()
+    ITile GetEmptyTile()
     {
         int x = UnityEngine.Random.Range(0, level.sizeX);
         int y = UnityEngine.Random.Range(0, level.sizeY);
@@ -585,4 +584,5 @@ public class BaseLevelGenerator : MonoBehaviour {
         tilemap.Refresh();
     }
     */
+
 }

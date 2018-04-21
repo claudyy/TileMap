@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public class TileBehavior_Growing : BaseTileBehvior
 {
+    /*
     public TileLevelData_Growing growingData;
     float curGrowTime;
     public TileBehavior_Growing(TileLevelData_Growing growingData)
@@ -37,10 +38,12 @@ public class TileBehavior_Growing : BaseTileBehvior
         //if (level.GetTile(x, y).IsEmpty())
             //level.GetTile(x, y).OverrideData(growingData.growingTile); 
     }
+    */
 }
 [CreateAssetMenu(menuName = "Data/LevelGeneration/TileData_Growing")]
 public class TileLevelData_Growing : TileLevelData
 {
+    /*
     public TileLevelData growingTile;
     public float growingSpeed;
     public int maxSize;
@@ -48,4 +51,5 @@ public class TileLevelData_Growing : TileLevelData
     {
         return new TileBehavior_Growing(this);
     }
+    */
 }

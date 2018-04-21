@@ -4,6 +4,7 @@ using UnityEngine;
 
 [System.Serializable]
 public class BaseRoom : BaseLevelStructure {
+    /*
     public Structure_BaseRoomData roomData;
     public int sizeX { get { return roomData.sizeX; } }
     public int sizeY { get { return roomData.sizeY; } }
@@ -99,10 +100,12 @@ public class BaseRoom : BaseLevelStructure {
         b.SetMinMax(new Vector3(posX, posY), new Vector3(posX + sizeX, posY+sizeY));
         return new List<Bounds>(1) {b};
     }
+    */
 }
 
 [CreateAssetMenu(menuName = "TileMap/LevelGenerator/BaseRoom")]
 public class Structure_BaseRoomData : BaseLevelStructureData {
+    /*
     public TileLevelData[] roomTileList;
     public int sizeX;
     public int sizeY;
@@ -246,4 +249,5 @@ public class Structure_BaseRoomData : BaseLevelStructureData {
     public int PosToIndex(int x,int y) {
         return x + y * sizeX;
     }
+    */
 }

@@ -7,6 +7,7 @@ using System.Linq;
 using ClaudeFehlen.Tileset.Pathfinding;
 [ExecuteInEditMode()]
 public class FixedRoomGenerator : BaseLevelGenerator {
+    /*
     public List<FixedRoomData_Exit> roomExitDataList;
     public List<FixedRoomData_Entry> roomEntryDataList;
     public List<FixedRoomData_Shop> roomShopDataList;
@@ -569,4 +570,5 @@ public class FixedRoomGenerator : BaseLevelGenerator {
                 count++;
         return count;
     }
+    */
 }

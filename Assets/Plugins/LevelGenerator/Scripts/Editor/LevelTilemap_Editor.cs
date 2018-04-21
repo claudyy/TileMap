@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.Tilemaps;
-[CustomEditor(typeof(LevelTilemap))]
+[CustomEditor(typeof(LevelTilemap),true)]
 public class LevelTilemap_Editor : Editor {
 
     public override void OnInspectorGUI() {

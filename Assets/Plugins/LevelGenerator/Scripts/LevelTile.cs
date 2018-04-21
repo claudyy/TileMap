@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 //[System.Serializable]
 public class LevelTile {
+    /*
     const int defaultTileID = 29;
     public int tileID;
     public int health;
@@ -24,12 +25,12 @@ public class LevelTile {
         data = null;
         this.pos = pos;
     }
-    public LevelTile(Vector3Int pos, TileLevelData data,LevelTilemap level) {
+    public LevelTile(Vector3Int pos, TileLevelData data, ITileMap level) {
         tileID = defaultTileID;
         this.pos = new Vector2Int(pos.x,pos.y);
         OverrideData(level, data);
     }
-    public void Init(LevelTilemap level)
+    public void Init(ITileMap level)
     {
         if (data == null) {
             behavior = null;
@@ -39,12 +40,12 @@ public class LevelTile {
         }
         needUpdate = true;
     }
-    public void UpdateBehaviorTile(LevelTilemap level)
+    public void UpdateBehaviorTile(ITileMap level)
     {
         if(behavior != null)
             behavior.Update(level,this);
     }
-    public void UpdateBehaviorInViewTile(LevelTilemap level) {
+    public void UpdateBehaviorInViewTile(ITileMap level) {
         if (behavior != null)
             behavior.UpdateInView(level, this);
     }
@@ -56,7 +57,7 @@ public class LevelTile {
         return data.tile == null;
     }
 
-    public void OverrideData(LevelTilemap level,TileLevelData data)
+    public void OverrideData(ITileMap level,TileLevelData data)
     {
         this.data = data;
         if(data != null) {
@@ -90,12 +91,12 @@ public class LevelTile {
             return false;
         return behavior.NeedUpdate();
     }
-    public bool OverrideColor(LevelTilemap level) {
+    public bool OverrideColor(ITileMap level) {
         if (HaveBehavior() == false)
             return false;
         return behavior.OverrideColor(this,level);
     }
-    public virtual void ApplyDamage(LevelTilemap level,TileDamageType type, int damage) {
+    public virtual void ApplyDamage(ITileMap level,TileDamageType type, int damage) {
         //if (HaveBehavior())
         //    behavior.OnDamage(this,level, type, damage);
         if (health == -1)
@@ -108,19 +109,20 @@ public class LevelTile {
         }
         Destroy(level);
     }
-    public virtual void Destroy(LevelTilemap level) {
+    public virtual void Destroy(ITileMap level) {
         if (HaveBehavior())
             behavior.OnDestry(this, level);
         Remove(level);
-        level.DestroyWall(new Vector2Int((int)pos.x, (int)pos.y));
+        //level.DestroyWall(new Vector2Int((int)pos.x, (int)pos.y));
     }
-    public virtual void Remove(LevelTilemap level) {
+    public virtual void Remove(ITileMap level) {
         if (HaveBehavior())
             behavior.OnRemove(this,level);
     }
-    public Color GetColor(LevelTilemap level) {
+    public Color GetColor(ITileMap level) {
         if (HaveBehavior() == false)
             return Color.white;
         return behavior.GetColor(this,level);
     }
+    */
 }

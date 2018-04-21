@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ClaudeFehlen.Tileset.Pathfinding;
 public class BaseFixedRoom : BaseRoom{
-
+    /*
     public static BaseFixedRoom EmptyRoom(int x,int y) {
         var r = new BaseFixedRoom();
         r.fixedX = x;
@@ -52,11 +52,12 @@ public class BaseFixedRoom : BaseRoom{
         }
     }
     public BaseFixedRoom parent;
+    */
 }
 public class BaseFixedRoomData : Structure_BaseRoomData {
-
+    /*
     public override BaseLevelStructure GetStructure() {
         return new BaseFixedRoom();
     }
-    
+    */
 }

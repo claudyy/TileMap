@@ -82,7 +82,7 @@ public class BiomWallData{
     public float blendFactore = .5f;
 	public bool randomOffset;
 	public NoiseMixer noiseMixer;
-	public void Generate(Rect rect,LevelTilemap level,bool[,] canOverwrite)
+	public void Generate(Rect rect, LevelTilemap level,bool[,] canOverwrite)
     {
        //GenerateUtility utility = new GenerateUtility();
        //float value = 1;

@@ -71,14 +71,14 @@ public class BaseLevelStructureData : ScriptableObject {
     public virtual void Generate(Rect rect, GeneratorMapData map) {
 
     }
-    public virtual void Generate(Rect rect,LevelTilemap level,bool[,] canOverwrite)
+    public virtual void Generate(Rect rect, LevelTilemap level,bool[,] canOverwrite)
     {
 		for (int i = 0; i < 2; i++) {
 			if (TryToGenerate (rect,level,canOverwrite))
 				return;
 		}
     }
-	public virtual bool TryToGenerate(Rect rect,LevelTilemap level,bool[,] canOverwrite){
+	public virtual bool TryToGenerate(Rect rect, LevelTilemap level,bool[,] canOverwrite){
 		return true;
 	}
     public float ReadTexture(Texture2D tex, float x, float y)

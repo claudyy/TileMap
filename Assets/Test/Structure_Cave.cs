@@ -39,7 +39,7 @@ public class StructureTunnel
                 if (value > .5f)
                 {
 					canOverwrite[posX-(int)rect.x, posY-(int)rect.y] = false;
-                    level.GetTile(posX, posY).OverrideData(level,tileData);
+                    //level.GetITile(posX, posY).OverrideData(level,tileData);
                 }
             }
         }
@@ -103,7 +103,7 @@ public class StructureCave{
                 if (value > .5f)
                 {
 					canOverwrite [posX-(int)rect.x, posY-(int)rect.y] = false;
-                    level.GetTile(posX, posY).OverrideData(level,tileData);
+                    //level.GetTile(posX, posY).OverrideData(level,tileData);
                 }
             }
         }
@@ -130,6 +130,7 @@ public class StructureCave{
 [CreateAssetMenu(menuName = "Data/LevelGeneration/Structure/Cave")]
 public class Structure_Cave : BaseLevelStructureData
 {
+    /*
     public Texture2D noise;
     public Texture2D tunnelTex;
     public Texture2D caveTex;
@@ -204,6 +205,6 @@ public class Structure_Cave : BaseLevelStructureData
 
 		return true;
 	}
-
+    */
 }
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 [CustomEditor(typeof(BaseLevelGenerator),editorForChildClasses:true)]
 public class BaseLevelGenerator_Editor : Editor {
+    /*
     public Coroutine c;
     public BaseLevelGenerator generator;
     public override void OnInspectorGUI() {
@@ -29,4 +30,5 @@ public class BaseLevelGenerator_Editor : Editor {
         }
     
     }
+    */
 }
