@@ -96,8 +96,8 @@ public class LevelTile {
         return behavior.OverrideColor(this,level);
     }
     public virtual void ApplyDamage(LevelTilemap level,TileDamageType type, int damage) {
-        if (HaveBehavior())
-            behavior.OnDamage(this,level, type, damage);
+        //if (HaveBehavior())
+        //    behavior.OnDamage(this,level, type, damage);
         if (health == -1)
             return;
         if (data == null || data.type != type)

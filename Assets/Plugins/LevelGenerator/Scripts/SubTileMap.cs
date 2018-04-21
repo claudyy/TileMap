@@ -140,7 +140,7 @@ public class SubTileMap{
     }
     void RemoveTile(int x, int y) {
         var tile = GetTile(x, y);
-        tile.Remove();
+        //tile.Remove();
         if (tile.HaveBehaviorUpdate())
             updateTiles.Remove(tile);
         if (tile.HaveBehaviorViewUpdate())
