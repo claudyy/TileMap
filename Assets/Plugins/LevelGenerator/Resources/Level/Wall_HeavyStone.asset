@@ -12,6 +12,4 @@ MonoBehaviour:
   m_Name: Wall_HeavyStone
   m_EditorClassIdentifier: 
   tile: {fileID: 11400000, guid: ba85db5a544446247a92160e14ae10ce, type: 2}
-  health: 4
-  type: 0
-  dropItem: {fileID: 0}
+  editorColor: {r: 1, g: 0.07450981, b: 0, a: 1}

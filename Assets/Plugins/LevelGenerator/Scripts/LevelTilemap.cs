@@ -50,6 +50,7 @@ public abstract class LevelTilemap : MonoBehaviour {
 
     public int sizeX;
     public int sizeY;
+    public SaveUtility saveUtility;
 
     private void Awake()
     {
@@ -70,6 +71,41 @@ public abstract class LevelTilemap : MonoBehaviour {
             }
         }
     }
+    #region Unity Tilemap Utility
+    public Vector3Int GetTileMapSize() {
+        return tilemap.size;
+    }
+    public TileLevelData LoadDataFromTileMap(Vector3Int pos, TileLevelData[] allData) {
+       var tile = tilemap.GetTile(pos);
+        for (int i = 0; i < allData.Length; i++) {
+            if (tile == allData[i].tile)
+                return allData[i];
+        }
+        return null;
+    }
+    public TileMapSaveData GetSaveDataFromTileMap() {
+        var size = GetTileMapSize();
+        TileMapSaveData st = new TileMapSaveData();
+        st.sizeX = size.x;
+        st.sizeY = size.y;
+        Vector3Int pos = new Vector3Int(0, 0, 0);
+        TileSaveData[] datas = new TileSaveData[size.x * size.y];
+        var allData = Resources.LoadAll("", typeof(TileLevelData)).Cast<TileLevelData>().ToArray();
+        for (int x = 0; x < size.x; x++) {
+            for (int y = 0; y < size.y; y++) {
+                pos.x = x;
+                pos.y = y;
+                datas[x + y * size.x] = new TileSaveData(LoadDataFromTileMap(pos, allData));
+            }
+        }
+        st.tiles = datas;
+        return st;
+    }
+    public virtual void ClearTilemap() {
+        tilemap.ClearAllTiles();
+    }
+    #endregion
+
     protected virtual void Init() {
         sizeX = levelChunkX* chunkSize;
         sizeY = levelChunkY* chunkSize;
@@ -150,10 +186,11 @@ public abstract class LevelTilemap : MonoBehaviour {
     }
     
 
+
     #region Load Save
     public void Load() {
         XmlSerializer serializer = new XmlSerializer(typeof(TileMapSaveData));
-        FileStream stream = new FileStream(Application.dataPath + "/Test.xml", FileMode.Open);
+        FileStream stream = new FileStream(saveUtility.GetPath(), FileMode.Open);
         var st = serializer.Deserialize(stream) as TileMapSaveData;
         stream.Close();
         Load(st);
@@ -221,7 +258,18 @@ public abstract class LevelTilemap : MonoBehaviour {
         }
 
     }
+    public TileLevelData[] GetTileLevelDataFromSaveFile(TileMapSaveData st) {
+        var allData = Resources.LoadAll("", typeof(TileLevelData)).Cast<TileLevelData>().ToArray();
+        var tiles = new TileLevelData[st.sizeX * st.sizeY];
+        for (int x = 0; x < st.sizeX; x++) {
+            for (int y = 0; y < st.sizeY; y++) {
+                tiles[x+y*st.sizeX] = GetDataFromList(st.tiles[x + y * st.sizeX].tileDataName, allData);
+            }
+        }
+        return tiles;
+    }
     public void ApplySaveFileToMap(TileMapSaveData st) {
+        ClearTilemap();
         var allData = Resources.LoadAll("", typeof(TileLevelData)).Cast<TileLevelData>().ToArray();
         TileLevelData tile = null;
         Vector3Int pos = new Vector3Int(0,0,0);
@@ -231,12 +279,12 @@ public abstract class LevelTilemap : MonoBehaviour {
                 pos.x = x;
                 pos.y = y;
                 if (tile != null)
-                    tilemap.SetTile(pos, tile.GetTile());
+                    SetTile(pos, tile.GetTile());
             }
         }
     }
     public void Save() {
-       var st =  new TileMapSaveData();
+        var st =  new TileMapSaveData();
         st.sizeX = sizeX;
         st.sizeY = sizeY;
         st.tiles = new TileSaveData[sizeX + sizeY * sizeX];
@@ -256,11 +304,24 @@ public abstract class LevelTilemap : MonoBehaviour {
         }
 
         XmlSerializer serializer = new XmlSerializer(typeof(TileMapSaveData));
-        FileStream stream = new FileStream(Application.dataPath + "/Test.xml", FileMode.Create);
+        FileStream stream = new FileStream(saveUtility.GetPath(), FileMode.Create);
         serializer.Serialize(stream,st);
         stream.Close();
     }
+    public void CreateSaveFile(TileMapSaveData st,SaveUtility saveUtility) {
+        XmlSerializer serializer = new XmlSerializer(typeof(TileMapSaveData));
+        FileStream stream = new FileStream(saveUtility.GetPath(), FileMode.Create);
+        serializer.Serialize(stream, st);
+        stream.Close();
+# if UNITY_EDITOR
+        UnityEditor.AssetDatabase.Refresh();
+#endif
+    }
     #endregion
+
+
+
+
     public TileLevelData GetDataFromList(string name, TileLevelData[] list) {
         if (name == "")
             return null;
