@@ -11,5 +11,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ef29f55224328a47b46ef797aa96848, type: 3}
   m_Name: Floor
   m_EditorClassIdentifier: 
-  tile: {fileID: 11400000, guid: 87a94a67ed9fc5447a719bbadf5b62a2, type: 2}
+  tile: {fileID: 11400000, guid: 125bf28ae3913784daee14b92d56b12a, type: 2}
   editorColor: {r: 0, g: 1, b: 0.8627451, a: 1}

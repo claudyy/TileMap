@@ -8,15 +8,25 @@ public abstract class BaseTile {
 
     public TileLevelData data;
     public BaseTileBehvior behavior;
-    public Vector2Int pos;
+    public Vector3Int pos;
+    public int x;
+    public int y;
 
     public bool needUpdate;
-
-    public virtual void Init(LevelTilemap level) {
+    BaseTileMapGameobject go;
+    public void Init(LevelTilemap level, TileLevelData data, int x, int y) {
+        Init(level, data, new Vector3Int(x, y, 0));
+    }
+    public virtual void Init(LevelTilemap level, TileLevelData data, Vector3Int pos) {
+        this.data = data;
+        this.pos = pos;
+        x = pos.x;
+        y = pos.y;
         if (data == null) {
             behavior = null;
         } else {
             behavior = data.GetBehavior();
+            data.Init(level, this);
             behavior.Init(level, this);
         }
         needUpdate = true;
@@ -35,11 +45,11 @@ public abstract class BaseTile {
             return true;
         return data.tile == null;
     }
-
-    public void OverrideData(LevelTilemap level, TileLevelData data) {
-        this.data = data;
-
-        Init(level);
+    public void OverrideData(LevelTilemap level, TileLevelData data, int x,int y) {
+        Init(level, data, x,y);
+    }
+    public void OverrideData(LevelTilemap level, TileLevelData data, Vector3Int pos) {
+        Init(level,data,pos);
     }
 
 
@@ -66,6 +76,9 @@ public abstract class BaseTile {
         if (HaveBehavior())
             behavior.OnDestry(this, level);
         Remove(level);
+        if (go != null)
+            GameObject.Destroy(go.gameObject);
+
     }
     public virtual void Remove(LevelTilemap level) {
         if (HaveBehavior())
@@ -75,5 +88,8 @@ public abstract class BaseTile {
         if (HaveBehavior() == false)
             return Color.white;
         return behavior.GetColor(this, level);
+    }
+    public virtual void AddGo(BaseTileMapGameobject go) {
+        this.go = go;
     }
 }

@@ -65,4 +65,7 @@ public class TileLevelData : ScriptableObject{
     public virtual Tile GetTile() {
         return tile;
     }
+    public virtual void Init(LevelTilemap map,BaseTile tile) {
+
+    }
 }

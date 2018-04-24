@@ -8,8 +8,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ef29f55224328a47b46ef797aa96848, type: 3}
+  m_Script: {fileID: 11500000, guid: 0f5e447fd0cd0b746a74068389157824, type: 3}
   m_Name: Wall
   m_EditorClassIdentifier: 
-  tile: {fileID: 11400000, guid: eaceba3f03bf412448e22eb8a675dad2, type: 2}
+  tile: {fileID: 11400000, guid: c310165e3cc80bf47bcd7106014386f3, type: 2}
   editorColor: {r: 0, g: 1, b: 0.105882354, a: 1}
+  go: {fileID: 114210268807079466, guid: 3015774bfb5710f4abf5afd5880396f9, type: 2}

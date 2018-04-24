@@ -72,6 +72,16 @@ public abstract class LevelTilemap : MonoBehaviour {
         }
     }
     #region Unity Tilemap Utility
+    public virtual void SetTile(Vector3Int pos, TileBase tile) {
+        tilemap.SetTile(IndexToTilemap(pos), tile);
+    }
+    public virtual void SetTiles(Vector3Int[] pos, TileBase[] tiles) {
+        Vector3Int[] worldpos = new Vector3Int[pos.Length];
+        for (int i = 0; i < pos.Length; i++) {
+            worldpos[i] = IndexToTilemap(pos[i]);
+        }
+        tilemap.SetTiles(worldpos, tiles);
+    }
     public Vector3Int GetTileMapSize() {
         return tilemap.size;
     }
@@ -319,8 +329,23 @@ public abstract class LevelTilemap : MonoBehaviour {
     }
     #endregion
 
-
-
+    public void AddGameObjectToTile(BaseTile tile,BaseTileMapGameobject prefab) {
+        var go = Instantiate(prefab, transform);
+        vec3IntTemp.x = tile.pos.x;
+        vec3IntTemp.y = tile.pos.y;
+        vec3IntTemp.z = 0;
+        go.transform.position = IndexToWorldPos(vec3IntTemp);
+        tile.AddGo(go);
+    }
+    public virtual Vector3Int IndexToTilemap(Vector3Int index) {
+        return index;
+    }
+    public virtual Vector3Int WorldPosToIndex(Vector3 worldPos) {
+        return new Vector3Int((int)worldPos.x,(int)worldPos.y,0);
+    }
+    public virtual Vector3 IndexToWorldPos(Vector3Int index) {
+        return index;
+    }
 
     public TileLevelData GetDataFromList(string name, TileLevelData[] list) {
         if (name == "")
@@ -539,11 +564,6 @@ public abstract class LevelTilemap : MonoBehaviour {
 
     }
     #region
-    public virtual void SetTile(Vector3Int pos,TileBase tile) {
-        tilemap.SetTile(pos, tile);
-    }
-    public virtual void SetTiles(Vector3Int[] pos, TileBase[] tiles) {
-        tilemap.SetTiles(pos, tiles);
-    }
+    
     #endregion
 }
