@@ -23,7 +23,7 @@ public class TilemapTextureConverter : MonoBehaviour {
         TileSaveData[] datas = new TileSaveData[st.sizeX * st.sizeY];
         for (int x = 0; x < loadTexture.width; x++) {
             for (int y = 0; y < loadTexture.height; y++) {
-                datas[x + y * loadTexture.height] = GetDataFromColor(loadTexture.GetPixel(x, y), allData);
+                datas[x + y * loadTexture.width] = GetDataFromColor(loadTexture.GetPixel(x, y), allData);
 
             }
         }

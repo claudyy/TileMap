@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ClaudeFehlen.Tileset.Pathfinding;
 public class BaseFixedRoom : BaseRoom{
-    /*
+
     public static BaseFixedRoom EmptyRoom(int x,int y) {
         var r = new BaseFixedRoom();
         r.fixedX = x;
@@ -35,15 +35,7 @@ public class BaseFixedRoom : BaseRoom{
         }
         return -compare;
     }
-    int heapIndex;
-    public int HeapIndex {
-        get {
-            return heapIndex;
-        }
-        set {
-            heapIndex = value;
-        }
-    }
+    public int HeapIndex;
     public int gCost;
     public int hCost;
     public int fCost {
@@ -52,12 +44,13 @@ public class BaseFixedRoom : BaseRoom{
         }
     }
     public BaseFixedRoom parent;
-    */
 }
 public class BaseFixedRoomData : Structure_BaseRoomData {
-    /*
+
     public override BaseLevelStructure GetStructure() {
-        return new BaseFixedRoom();
+        var room = new BaseFixedRoom();
+        room.Init(this);
+        return room;
     }
-    */
+    
 }

@@ -403,7 +403,7 @@ public abstract class LevelTilemap : MonoBehaviour {
     public BaseTile GetITile(Vector2Int pos) {
         return GetTile<BaseTile>(pos.x, pos.y);
     }
-    protected BaseTile GetITile(int x, int y) {
+    public BaseTile GetITile(int x, int y) {
         return GetTile<BaseTile>(x, y);
     }
     public T GetTile<T>(int x, int y) where T: BaseTile {

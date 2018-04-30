@@ -43,13 +43,13 @@ TextureImporter:
   spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 0
-  spritePivot: {x: 0.5, y: 0.5}
+  alignment: 9
+  spritePivot: {x: 0.5, y: 0.25}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 128
   alphaUsage: 1
   alphaIsTransparency: 1
-  spriteTessellationDetail: -1
+  spriteTessellationDetail: 0
   textureType: 8
   textureShape: 1
   maxTextureSizeSet: 0
@@ -79,8 +79,33 @@ TextureImporter:
   spriteSheet:
     serializedVersion: 2
     sprites: []
-    outline: []
-    physicsShape: []
+    outline:
+    - - {x: 128, y: 68}
+      - {x: 119, y: 73}
+      - {x: 97, y: 84}
+      - {x: 94, y: 86}
+      - {x: 73, y: 97}
+      - {x: 48, y: 110}
+      - {x: 27, y: 121}
+      - {x: 12, y: 128}
+      - {x: -10, y: 128}
+      - {x: -124, y: 71}
+      - {x: -128, y: 68}
+      - {x: -128, y: -68}
+      - {x: -88, y: -88}
+      - {x: -85, y: -90}
+      - {x: -9, y: -128}
+      - {x: 7, y: -128}
+      - {x: 122, y: -70}
+      - {x: 124, y: -70}
+      - {x: 128, y: -68}
+    physicsShape:
+    - - {x: 121.6405, y: -64.8728}
+      - {x: -0.9443207, y: -9.137718}
+      - {x: -128, y: -75}
+      - {x: -10, y: -128}
+      - {x: 21, y: -128}
+      - {x: 128, y: -68}
   spritePackingTag: 
   userData: 
   assetBundleName: 

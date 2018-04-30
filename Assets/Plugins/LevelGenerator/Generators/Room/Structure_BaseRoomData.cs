@@ -1,10 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
 public class BaseRoom : BaseLevelStructure {
-    /*
     public Structure_BaseRoomData roomData;
     public int sizeX { get { return roomData.sizeX; } }
     public int sizeY { get { return roomData.sizeY; } }
@@ -28,8 +28,11 @@ public class BaseRoom : BaseLevelStructure {
         LeftDoorPos = new List<bool>(new bool[roomData.sizeY]);
         RightDoorPos = new List<bool>(new bool[roomData.sizeY]);
     }
-    public override IEnumerator Generate(GeneratorMapData map) {
-        base.Generate(map);
+
+
+
+    public override IEnumerator RunTimeGenerate(GeneratorMapData map) {
+        base.RunTimeGenerate(map);
         int startX = posX;
         int startY = posY;
         for (int x = 0; x < roomData.sizeX; x++) {
@@ -71,6 +74,51 @@ public class BaseRoom : BaseLevelStructure {
             }
         }
     }
+    public override void Generate(GeneratorMapData map) {
+        base.Generate(map);
+        int startX = posX;
+        int startY = posY;
+        for (int x = 0; x < roomData.sizeX; x++) {
+            for (int y = 0; y < roomData.sizeY; y++) {
+                OverrideTile(map, x, y, startX, startY);
+            }
+        }
+    }
+    public void OverrideTile(GeneratorMapData map,int x,int y,int startX,int startY) {
+        if (y == 0) {
+            if (BottomDoorPos[x] == true)
+                map.OverrideTile(startX + x, startY + y, roomData.floor);
+            else
+                map.OverrideTile(startX + x, startY + y, roomData.wall);
+
+            return;
+        }
+        if (x == 0) {
+            if (LeftDoorPos[y] == true)
+                map.OverrideTile(startX + x, startY + y, roomData.floor);
+            else
+                map.OverrideTile(startX + x, startY + y, roomData.wall);
+
+            return;
+        }
+        if (x == roomData.sizeX - 1) {
+            if (RightDoorPos[y] == true)
+                map.OverrideTile(startX + x, startY + y, roomData.floor);
+            else
+                map.OverrideTile(startX + x, startY + y, roomData.wall);
+
+            return;
+        }
+        if (y == roomData.sizeY - 1) {
+            if (TopDoorPos[x] == true)
+                map.OverrideTile(startX + x, startY + y, roomData.floor);
+            else
+                map.OverrideTile(startX + x, startY + y, roomData.wall);
+
+            return;
+        }
+        map.OverrideTile(startX + x, startY + y, roomData.roomTileList[x * y]);
+    }
     public void SetDoorTop(int x) {
         TopDoorPos[x-1] = true;
         TopDoorPos[x] = true;
@@ -100,12 +148,11 @@ public class BaseRoom : BaseLevelStructure {
         b.SetMinMax(new Vector3(posX, posY), new Vector3(posX + sizeX, posY+sizeY));
         return new List<Bounds>(1) {b};
     }
-    */
 }
 
 [CreateAssetMenu(menuName = "TileMap/LevelGenerator/BaseRoom")]
 public class Structure_BaseRoomData : BaseLevelStructureData {
-    /*
+    [HideInInspector]
     public TileLevelData[] roomTileList;
     public int sizeX;
     public int sizeY;
@@ -114,15 +161,15 @@ public class Structure_BaseRoomData : BaseLevelStructureData {
     public TileLevelData floor;
     public TileLevelData fillData;
 
-    public void UpdateSize() {
-        roomTileList = new TileLevelData[FixedRoomGenerator.fixedRoomSizeX * FixedRoomGenerator.fixedRoomSizeY];
-        sizeX = FixedRoomGenerator.fixedRoomSizeX;
-        sizeY = FixedRoomGenerator.fixedRoomSizeY;
-        for (int x = 0; x < sizeX; x++) {
-            for (int y = 0; y < sizeY; y++) {
-                roomTileList[x + y * sizeX] = fillData;
-            }
-        }
+    public void UpdateDoors() {
+        //roomTileList = new TileLevelData[FixedRoomGenerator.fixedRoomSizeX * FixedRoomGenerator.fixedRoomSizeY];
+        //sizeX = FixedRoomGenerator.fixedRoomSizeX;
+        //sizeY = FixedRoomGenerator.fixedRoomSizeY;
+        //for (int x = 0; x < sizeX; x++) {
+        //    for (int y = 0; y < sizeY; y++) {
+        //        roomTileList[x + y * sizeX] = fillData;
+        //    }
+        //}
         topPossibleDoors = new List<bool>();
         for (int i = 0; i < sizeX; i++) {
             if (PossibleDoorTop(i))
@@ -249,5 +296,16 @@ public class Structure_BaseRoomData : BaseLevelStructureData {
     public int PosToIndex(int x,int y) {
         return x + y * sizeX;
     }
-    */
+
+    public void CreateRoomFromSaveFill(TileMapSaveData saveFile) {
+        sizeX = saveFile.sizeX;
+        sizeY = saveFile.sizeY;
+        GenerateUtility utility = new GenerateUtility();
+        roomTileList = new TileLevelData[sizeX * sizeY];
+        for (int x = 0; x < sizeX; x++) {
+            for (int y = 0; y < sizeY; y++) {
+                roomTileList[x + y * sizeX] = utility.GetDataFromName(saveFile.tiles[x + y * sizeX].tileDataName);
+            }
+        }
+    }
 }

@@ -93,12 +93,12 @@ Shader "Sprites/FogSprite"
 				c.a = clamp(c.a,min,1);
 				
 				float originalA = c.a;
-				Float cutL = IN.color.r + min;
-				Float cutR = IN.color.g + min;
-				Float cutH = IN.color.b + min;
-				Float cutO = IN.color.a;
-				Float cutX = lerp(cutL ,cutR,frac(IN.cPos.x));
-				Float cutY = cutH;
+				float cutL = IN.color.r + min;
+				float cutR = IN.color.g + min;
+				float cutH = IN.color.b + min;
+				float cutO = IN.color.a;
+				float cutX = lerp(cutL ,cutR,frac(IN.cPos.x));
+				float cutY = cutH;
 				c.a = lerp(c.a,c.a*cutX*cutY,0);
 				//c.a = 1-step(c.a,1-cutX);
 				c.a = smoothstep(1-cutX,1-cutX+.06,c.a);

@@ -75,9 +75,9 @@ public class GeneratorMapData {
         return x >= sizeX || y >= sizeY || x < 0 || y < 0;
     }
 }
+[RequireComponent(typeof(LevelTilemap))]
 [ExecuteInEditMode()]
 public class BaseLevelGenerator : MonoBehaviour {
-    /*
     public TileLevelData defaultTileData;
     public LevelTilemap level;
     public StringBuilder result;
@@ -98,21 +98,29 @@ public class BaseLevelGenerator : MonoBehaviour {
             return 5;
         }
     }
-    protected virtual IEnumerator TryGenerate() {
+    protected virtual IEnumerator RunTimeTryGenerate() {
         structureList = new List<BaseLevelStructure>();
         yield return null;
+    }
+    protected virtual IEnumerator RunTimeGenerate(List<BaseLevelStructure> structure, GeneratorMapData map) {
+        for (int i = 0; i < structure.Count; i++) {
+            yield return StartCoroutine(structure[i].RunTimeGenerate(map));
+        }
     }
     protected virtual bool CheckGeneratedResult(List<BaseLevelStructure> structure) {
         return true;
     }
-    protected virtual IEnumerator Generate(List<BaseLevelStructure> structure, GeneratorMapData map) {
+    protected virtual void TryGenerate() {
+        structureList = new List<BaseLevelStructure>();
+    }
+    protected virtual void Generate(List<BaseLevelStructure> structure, GeneratorMapData map) {
         for (int i = 0; i < structure.Count; i++) {
-            yield return StartCoroutine(structure[i].Generate(map));
+            structure[i].Generate(map);
         }
     }
     //
     protected List<BaseLevelStructure> structureList;
-    public IEnumerator GenerateMap()
+    public IEnumerator RunTimeGenerateMap()
     {
         level.dontUpdate = true;
         yield return null;
@@ -125,7 +133,7 @@ public class BaseLevelGenerator : MonoBehaviour {
         for (int i = 0; i < 12; i++) {
             tries++;
 
-            yield return StartCoroutine(TryGenerate());
+            yield return StartCoroutine(RunTimeTryGenerate());
             if (CheckGeneratedResult(structureList))
                 break;
 
@@ -165,17 +173,13 @@ public class BaseLevelGenerator : MonoBehaviour {
         }
 
         DebugCheckTimeStart("Generating");
-        yield return StartCoroutine(Generate(structureList,map));
+        yield return StartCoroutine(RunTimeGenerate(structureList,map));
         _progress++;
         DebugCheckTimeEnd();
 
 
         DebugCheckTimeStart("UpdateViews");
         level.Load(map.GetNewSaveFile());
-        //level.Save();
-        //level.Load();
-        //yield return StartCoroutine(level.UpdatePrefabFromData());
-        //level.GenerateGridFromPrefab();
         
         _progress++;
         DebugCheckTimeEnd();
@@ -188,7 +192,71 @@ public class BaseLevelGenerator : MonoBehaviour {
 
 
     }
+    public void GenerateMap() {
+        stopwatch = new Stopwatch();
+        Stopwatch GenerationStopwatch = new Stopwatch();
+        GenerationStopwatch.Start();
+        result = new StringBuilder();
+        int tries = 0;
+        for (int i = 0; i < 12; i++) {
+            tries++;
 
+            TryGenerate();
+            if (CheckGeneratedResult(structureList))
+                break;
+
+        }
+
+        //rescale and move structures
+        DebugCheckTimeStart("Move every thing");
+        int minX = GetMinXFromStructure(structureList);
+        int minY = GetMinYFromStructure(structureList);
+        int moveX = 0 - minX + border;
+        int moveY = 0 - minY + border;
+        for (int i = 0; i < structureList.Count; i++) {
+            structureList[i].Move(moveX, moveY);
+        }
+        _progress++;
+        DebugCheckTimeEnd();
+
+        DebugCheckTimeStart("Calculate Bounds");
+
+        var bound = new Bounds(Vector3.one * .5f, Vector3.one);
+        for (int i = 0; i < structureList.Count; i++) {
+            structureList[i].EncapsulateBound(ref bound);
+        }
+        int mapSizeX = (int)bound.max.x + border;
+        int mapSizeY = (int)bound.max.y + border;
+        //level.Resize(, (int)bound.max.y + border);
+        var map = new GeneratorMapData(mapSizeX, mapSizeY, defaultTileData);
+
+        _progress++;
+        DebugCheckTimeEnd();
+
+        if (fillWithDefault) {
+            DebugCheckTimeStart("Fill Default");
+            //FillWithDataName(level,defaultTileData);
+            DebugCheckTimeEnd();
+        }
+
+        DebugCheckTimeStart("Generating");
+        Generate(structureList, map);
+        _progress++;
+        DebugCheckTimeEnd();
+
+
+        DebugCheckTimeStart("UpdateViews");
+        level.ApplySaveFileToMap(map.GetNewSaveFile());
+
+        _progress++;
+        DebugCheckTimeEnd();
+
+        result.AppendLine("All Generation Duration: " + GenerationStopwatch.Elapsed.Seconds + " : " + GenerationStopwatch.Elapsed.Milliseconds);
+        result.AppendLine("Tries: " + tries);
+        UnityEngine.Debug.Log(result.ToString());
+
+
+    }
 
 
     public int GetMinXFromStructure(List<BaseLevelStructure> s) {
@@ -221,19 +289,19 @@ public class BaseLevelGenerator : MonoBehaviour {
     public void DebugTryFail(string name) {
         result.AppendLine("Fail Because: " + name);
     }
-    public void FillWithDefault(ITileMap level) {
+    public void FillWithDefault(LevelTilemap level) {
         FillWithTile(level, defaultTileData);
     }
-    public void FillWithTile(ITileMap level,TileLevelData data) {
+    public void FillWithTile(LevelTilemap level,TileLevelData data) {
         for (int x = 0; x < level.sizeX; x++)
         {
             for (int y = 0; y < level.sizeY; y++)
             {
-                level.GetTile(x, y).OverrideData(level,data);
+                level.GetITile(x, y).OverrideData(level,data,x,y);
             }
         }
     }
-    public void FillWithDataName(ITileMap level, TileLevelData data) {
+    public void FillWithDataName(LevelTilemap level, TileLevelData data) {
         for (int x = 0; x < level.sizeX; x++) {
             for (int y = 0; y < level.sizeY; y++) {
                 level.OverrideDataNameTile(x,y,data);
@@ -262,25 +330,7 @@ public class BaseLevelGenerator : MonoBehaviour {
 			}
 		return false;
 	}
-    void GeneratePlant()
-    {
-        var target = GetEmptyTile();
-        //if (target != null)
-            //target.OverrideData(plant);
-    }
-    ITile GetEmptyTile()
-    {
-        int x = UnityEngine.Random.Range(0, level.sizeX);
-        int y = UnityEngine.Random.Range(0, level.sizeY);
-        for (int i = 0; i < 1000; i++)
-        {
-            if (level.GetTile(x, y).data.tile == null)
-                return level.GetTile(x, y);
-            x = UnityEngine.Random.Range(0, level.sizeX);
-            y = UnityEngine.Random.Range(0, level.sizeY);
-        }
-        return null;
-    }
+   
     /*
     [System.Serializable]
     public struct Chunk
@@ -584,5 +634,4 @@ public class BaseLevelGenerator : MonoBehaviour {
         tilemap.Refresh();
     }
     */
-
 }

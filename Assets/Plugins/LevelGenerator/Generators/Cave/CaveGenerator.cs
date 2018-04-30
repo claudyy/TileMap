@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CaveGenerator : BaseLevelGenerator {
-    /*
+
     public List<BiomData> bioms;
-    protected override IEnumerator TryGenerate() {
+    protected override IEnumerator RunTimeTryGenerate() {
         var sTemp = new List<BaseLevelStructure>();
         int lastY = 0;
         int totalY = 0;
@@ -22,5 +22,4 @@ public class CaveGenerator : BaseLevelGenerator {
         }
         structureList = sTemp;
     }
-    */
 }

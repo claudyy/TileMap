@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ClaudeFehlen.Tileset;
 public enum NoiseTextureMixType{
     multiply,
     add,
@@ -82,7 +83,7 @@ public class BiomWallData{
     public float blendFactore = .5f;
 	public bool randomOffset;
 	public NoiseMixer noiseMixer;
-	public void Generate(Rect rect, LevelTilemap level,bool[,] canOverwrite)
+	public void Generate(Rect rect,LevelTilemap level,bool[,] canOverwrite)
     {
        //GenerateUtility utility = new GenerateUtility();
        //float value = 1;
@@ -124,7 +125,7 @@ public class BiomStructure : BaseLevelStructure {
         base.Init(data);
         biomData = data as BiomData;
     }
-    public override IEnumerator Generate(GeneratorMapData map) {
+    public override IEnumerator RunTimeGenerate(GeneratorMapData map) {
         int startX = posX;
         int startY = posY;
 
