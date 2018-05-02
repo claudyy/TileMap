@@ -22,7 +22,7 @@ public class BaseTileBehvior
         inViewdeltaTime = Time.time - inViewlastUpdateTime;
         inViewlastUpdateTime = Time.time;
     }
-    public virtual Tile GetTile(BaseTile tile, LevelTilemap level) {
+    public virtual TileBase GetTile(BaseTile tile, LevelTilemap level) {
         return tile.data.GetTile();
     }
 
@@ -56,13 +56,13 @@ public class BaseTileBehvior
 [CreateAssetMenu(menuName ="Data/LevelGeneration/TileData")]
 public class TileLevelData : ScriptableObject{
 
-    public Tile tile;
+    public TileBase tile;
     public Color editorColor;
     public virtual BaseTileBehvior GetBehavior()
     {
         return new BaseTileBehvior();
     }
-    public virtual Tile GetTile() {
+    public virtual TileBase GetTile() {
         return tile;
     }
     public virtual void Init(LevelTilemap map,BaseTile tile) {

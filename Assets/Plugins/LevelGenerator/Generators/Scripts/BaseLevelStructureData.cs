@@ -34,6 +34,14 @@ public class BaseLevelStructure{
             otherBound.Encapsulate(myBounds[i].max);
         }
     }
+    public bool IntersectBound(Ray ray) {
+        var myBounds = GetBounds();
+        for (int i = 0; i < myBounds.Count; i++) {
+            if (myBounds[i].IntersectRay(ray) == false)
+                return false;
+        }
+        return true;
+    }
     public bool InBound(Vector3 pos) {
         var myBounds = GetBounds();
         for (int i = 0; i < myBounds.Count; i++) {
@@ -42,9 +50,26 @@ public class BaseLevelStructure{
         }
         return true;
     }
+    public bool InBound(List<Bounds> otherBound) {
+        for (int i = 0; i < otherBound.Count; i++) {
+            if (InBound(otherBound[i]) == true)
+                return true;
+        }
+        return false;
+    }
+    public bool InBound(Bounds otherBound) {
+        var myBounds = GetBounds();
+        for (int i = 0; i < myBounds.Count; i++) {
+            if (myBounds[i].Intersects(otherBound) == true)
+                return true;
+        }
+        return false;
+    }
     public int GetMinX() {
         var myBounds = GetBounds();
-        int x = posX;
+        if (myBounds.Count == 0)
+            return posX;
+        int x = (int)myBounds[0].min.x;
         for (int i = 0; i < myBounds.Count; i++) {
             if (myBounds[i].min.x < x)
                 x = (int)myBounds[i].min.x;
@@ -53,14 +78,16 @@ public class BaseLevelStructure{
     }
     public int GetMinY() {
         var myBounds = GetBounds();
-        int y = posY;
+        if (myBounds.Count == 0)
+            return posY;
+        int y = (int)myBounds[0].min.y;
         for (int i = 0; i < myBounds.Count; i++) {
-            if (myBounds[i].min.y< y)
+            if (myBounds[i].min.y < y)
                 y = (int)myBounds[i].min.y;
         }
         return y;
     }
-    public void Move(int x,int y) {
+    public virtual void Move(int x,int y) {
         posX += x;
         posY += y;
     }

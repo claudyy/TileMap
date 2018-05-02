@@ -61,7 +61,7 @@ public class LevelTilePainter_Editor : Editor {
     void UpdateBrushes(LevelTilePainter painter) {
         brushContent = new List<GUIContent>();
         for (int i = 0; i < painter.brushes.Count; i++) {
-            brushContent.Add(new GUIContent(painter.brushes[i].tile.sprite.texture));
+            //brushContent.Add(new GUIContent(painter.brushes[i].tile.sprite.texture));
         }
     }
 }

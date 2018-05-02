@@ -82,8 +82,26 @@ public abstract class LevelTilemap : MonoBehaviour {
         }
         tilemap.SetTiles(worldpos, tiles);
     }
+    Vector3Int VectorIntTemp;
     public Vector3Int GetTileMapSize() {
-        return tilemap.size;
+        Vector3Int size = Vector3Int.zero;
+        for (int x = 0; x < tilemap.size.x; x++) {
+            VectorIntTemp.x = x;
+            VectorIntTemp.y = 0;
+            VectorIntTemp.z = 0;
+            if (tilemap.GetTile(VectorIntTemp) == null)
+                break;
+            size.x += 1;
+        }
+        for (int y = 0; y < tilemap.size.y; y++) {
+            VectorIntTemp.x = 0;
+            VectorIntTemp.y = y;
+            VectorIntTemp.z = 0;
+            if (tilemap.GetTile(VectorIntTemp) == null)
+                break;
+            size.y += 1;
+        }
+        return size;
     }
     public TileLevelData LoadDataFromTileMap(Vector3Int pos, TileLevelData[] allData) {
        var tile = tilemap.GetTile(pos);
@@ -123,9 +141,7 @@ public abstract class LevelTilemap : MonoBehaviour {
     void SetupChunks() {
         tileMapList = new Dictionary<int, SubTileMap>();
     }
-    private void Update()
-    {
-    }
+
     IEnumerator UpdateAllTiles() {
         for (int x = 0; x < levelChunkX; x++) {
             for (int y = 0; y < levelChunkY; y++) {
@@ -149,7 +165,7 @@ public abstract class LevelTilemap : MonoBehaviour {
         for (int x = fromX; x <= toX; x++) {
             for (int y = fromY; y <= toY; y++) {
                 if(midChunk != lastMidChunk)
-                    LoadVisibleChunk(x, y);
+                    LoadChunkFirstTime(x, y);
                 UpdateVisibleChunk(x, y);
             }
         }
@@ -157,7 +173,7 @@ public abstract class LevelTilemap : MonoBehaviour {
         updateVisibleCoroutine = StartCoroutine(UpdateVisible());
         lastMidChunk = midChunk;
     }
-    public virtual void LoadVisibleChunk(int cx, int cy) {
+    public virtual void LoadChunkFirstTime(int cx, int cy) {
         var chunk = GetTileMap(cx, cy);
 
 
@@ -173,10 +189,14 @@ public abstract class LevelTilemap : MonoBehaviour {
                 vec3IntTemp.x = x + cx * chunkSize;
                 vec3IntTemp.y = y + cy * chunkSize;
                 tileTemp = GetITile(vec3IntTemp.x, vec3IntTemp.y);
-                if (tileTemp != null)
+
+                if (tileTemp != null) {
                     dataTemp = tileTemp.data;
-                if (dataTemp != null)
+                }
+                if (dataTemp != null) {
                     tileViewTemp = tileTemp.data.tile;
+                    LoadTileFirstTime(tileTemp);
+                }
                 if (tileViewTemp != null) {
                     tiles[x+y*chunkSize] = tileViewTemp;
                     pos[x + y * chunkSize] = vec3IntTemp;
@@ -195,12 +215,22 @@ public abstract class LevelTilemap : MonoBehaviour {
         GetTileMap(x, y).UpdateInView(this);
     }
     
+    public virtual void LoadTileFirstTime(BaseTile tile) {
+
+    }
 
 
     #region Load Save
     public void Load() {
         XmlSerializer serializer = new XmlSerializer(typeof(TileMapSaveData));
         FileStream stream = new FileStream(saveUtility.GetPath(), FileMode.Open);
+
+        //TextAsset textAsset = (TextAsset)Resources.Load(saveUtility.fileName);
+        //XmlDocument xmldoc = new XmlDocument();
+        //xmldoc.LoadXml(textAsset.text);
+        //XmlReader reader = new XmlNodeReader(xmldoc);
+        //TileMapSaveData result = (TileMapSaveData)serializer.Deserialize(reader);
+
         var st = serializer.Deserialize(stream) as TileMapSaveData;
         stream.Close();
         Load(st);
@@ -251,7 +281,7 @@ public abstract class LevelTilemap : MonoBehaviour {
         if (loadAllChunks) {
             for (int x = 0; x < levelChunkX; x++) {
                 for (int y = 0; y < levelChunkY; y++) {
-                    LoadVisibleChunk(x, y);
+                    LoadChunkFirstTime(x, y);
                 }
             }
         }

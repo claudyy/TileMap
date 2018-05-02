@@ -8,8 +8,9 @@ public class BaseRoom : BaseLevelStructure {
     public Structure_BaseRoomData roomData;
     public int sizeX { get { return roomData.sizeX; } }
     public int sizeY { get { return roomData.sizeY; } }
-
-
+    public int centerX { get { return posX + sizeX / 2; } }
+    public int centerY { get { return posY + sizeY / 2; } }
+    public Vector2Int center { get { return new Vector2Int(centerX, centerY); } }
     public List<bool> TopDoorPos;
     public int topDoorCount = 0;
     public List<bool> BottomDoorPos;
@@ -85,7 +86,7 @@ public class BaseRoom : BaseLevelStructure {
         }
     }
     public void OverrideTile(GeneratorMapData map,int x,int y,int startX,int startY) {
-        if (y == 0) {
+        if (y == 0 && roomData.generateWalls) {
             if (BottomDoorPos[x] == true)
                 map.OverrideTile(startX + x, startY + y, roomData.floor);
             else
@@ -93,7 +94,7 @@ public class BaseRoom : BaseLevelStructure {
 
             return;
         }
-        if (x == 0) {
+        if (x == 0 && roomData.generateWalls) {
             if (LeftDoorPos[y] == true)
                 map.OverrideTile(startX + x, startY + y, roomData.floor);
             else
@@ -101,7 +102,7 @@ public class BaseRoom : BaseLevelStructure {
 
             return;
         }
-        if (x == roomData.sizeX - 1) {
+        if (x == roomData.sizeX - 1 && roomData.generateWalls) {
             if (RightDoorPos[y] == true)
                 map.OverrideTile(startX + x, startY + y, roomData.floor);
             else
@@ -109,7 +110,7 @@ public class BaseRoom : BaseLevelStructure {
 
             return;
         }
-        if (y == roomData.sizeY - 1) {
+        if (y == roomData.sizeY - 1 && roomData.generateWalls) {
             if (TopDoorPos[x] == true)
                 map.OverrideTile(startX + x, startY + y, roomData.floor);
             else
@@ -117,7 +118,7 @@ public class BaseRoom : BaseLevelStructure {
 
             return;
         }
-        map.OverrideTile(startX + x, startY + y, roomData.roomTileList[x * y]);
+        map.OverrideTile(startX + x, startY + y, roomData.roomTileList[x + y*roomData.sizeX]);
     }
     public void SetDoorTop(int x) {
         TopDoorPos[x-1] = true;
@@ -160,7 +161,7 @@ public class Structure_BaseRoomData : BaseLevelStructureData {
     public TileLevelData wall;
     public TileLevelData floor;
     public TileLevelData fillData;
-
+    public bool generateWalls;
     public void UpdateDoors() {
         //roomTileList = new TileLevelData[FixedRoomGenerator.fixedRoomSizeX * FixedRoomGenerator.fixedRoomSizeY];
         //sizeX = FixedRoomGenerator.fixedRoomSizeX;

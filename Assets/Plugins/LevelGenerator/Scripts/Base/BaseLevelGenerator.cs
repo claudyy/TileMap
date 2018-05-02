@@ -85,10 +85,6 @@ public class BaseLevelGenerator : MonoBehaviour {
     protected double time;
     protected Stopwatch stopwatch;
     public bool fillWithDefault;
-    //public List<BaseLevelStructure> structure;
-    //public TileLevelData plant;
-    //public BiomData biom;
-    //public List<BiomData> biomList;
     protected int _progress;
     public virtual float GetProgress() {
         return (float)_progress / MaxProgressStep;
@@ -227,7 +223,6 @@ public class BaseLevelGenerator : MonoBehaviour {
         }
         int mapSizeX = (int)bound.max.x + border;
         int mapSizeY = (int)bound.max.y + border;
-        //level.Resize(, (int)bound.max.y + border);
         var map = new GeneratorMapData(mapSizeX, mapSizeY, defaultTileData);
 
         _progress++;

@@ -13,8 +13,8 @@ public class FixedRoomGenerator : BaseLevelGenerator {
     public List<FixedRoomData_Shop> roomShopDataList;
     public List<FixedRoomData_Chest> roomChestDataList;
     public List<FixedRoomData_Standart> roomStandartDataList;
-    public const int fixedRoomSizeX = 28;
-    public const int fixedRoomSizeY = 18;
+    public int fixedRoomSizeX = 28;
+    public int fixedRoomSizeY = 18;
 
     public int levelSizeX;
     public int levelSizeY;
