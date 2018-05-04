@@ -9,8 +9,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0ef62ff3d6b37994c913434c580a04c0, type: 3}
-  m_Name: DungeonPlatfromer_Wall 1
+  m_Name: DungeonPlatfromer_BackgroundWall
   m_EditorClassIdentifier: 
-  tile: {fileID: 11400000, guid: 74e2679d02ed23645b29cde7ce52435f, type: 2}
-  editorColor: {r: 0, g: 0.7176471, b: 1, a: 1}
-  backgroundTile: {fileID: 11400000, guid: 766140b36a026a443ba233637f41c075, type: 2}
+  tile: {fileID: 0}
+  editorColor: {r: 1, g: 0, b: 0.25490198, a: 1}
+  backgroundTile: {fileID: 11400000, guid: 710b181739c6d99429cff49eed09ffbe, type: 2}

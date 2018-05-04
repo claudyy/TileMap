@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: CellShading
+  m_Name: CellShadingTile 1
   m_Shader: {fileID: 4800000, guid: cc2eb5a616328e848a96a5c14dfff8ee, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -31,10 +31,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _AmbientStrength: 0.979
-    - _LightStrength: 0.569
-    - _Shininess: 182.4
-    - _SunStrength: 0.507
+    - _AmbientStrength: 0.5
+    - _LightStrength: 0.5
+    - _Shininess: 10
+    - _SunStrength: 0.5
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
