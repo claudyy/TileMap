@@ -8,7 +8,7 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: PlatformerTilemap
   m_Shader: {fileID: 4800000, guid: d5d5492cbdacebb43ba448ac102e1027, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0

@@ -26,24 +26,49 @@ Shader "Custom/MetalicMappedTile" {
 
 		struct Input {
 			float2 uv_MainTex;
+			float2 screenuv;
+			float4 screenPos;
 		};
+		void vert (inout appdata_full v, out Input o) {
+			UNITY_INITIALIZE_OUTPUT(Input,o);
+			o.screenuv = ((v.vertex.xy / v.vertex.w) + 1) * 0.5;
 
+		}
 		fixed4 _Color;
 		half _Metallic,_Smoothness;
 		UNITY_INSTANCING_BUFFER_START(Props)
 		UNITY_INSTANCING_BUFFER_END(Props)
 
+		uniform sampler2D _GlobalRefractionTex;
+		uniform float _GlobalVisibility;
+		uniform float _GlobalRefractionMag;
+
+		float2 safemul(float4x4 M, float4 v)
+		{
+			float2 r;
+
+			r.x = dot(M._m00_m01_m02, v);
+			r.y = dot(M._m10_m11_m12, v);
+
+			return r;
+		}
+
 		void surf (Input IN, inout SurfaceOutputStandard o) {
 			fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
+
+			float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
+			//screenUV *= float2(8,6);
+			float2 offset = safemul(unity_ObjectToWorld, tex2D(_MyNormalMap, IN.uv_MainTex) * 2 - 1);
+			float4 worldRefl = tex2D(_GlobalRefractionTex, screenUV + offset.xy * _GlobalRefractionMag);
+			c.rgb+=worldRefl.rgb * worldRefl.a * _GlobalVisibility;
+
 			o.Albedo = c.rgb;
 			o.Alpha = c.a;
 			o.Normal = UnpackNormal(mul(unity_ObjectToWorld,tex2D(_MyNormalMap, IN.uv_MainTex)));
 			o.Metallic = tex2D(_MyMetallicMap, IN.uv_MainTex);
 			o.Smoothness =  tex2D(_MySmoothnessMap, IN.uv_MainTex);
 			o.Emission = tex2D(_MyEmissionMap, IN.uv_MainTex);
-			//o.Normal = UnpackNormal(tex2D(_MyNormalMap, IN.uv_MainTex));
-			//o.Albedo = fixed3(o.Normal.x,o.Normal.y,0);
-			// Hack for outline: Make black pixels always black
+
 			if(length(c.rgb)<0.001)
 			{
 				o.Normal = fixed3(0,0,-1);
