@@ -25,6 +25,9 @@ public class BaseLevelStructure{
     public virtual void TryGenerate(BaseLevelGenerator generator) {
 
     }
+    public virtual IEnumerator RunTimeTryGenerate(BaseLevelGenerator generator) {
+        yield return null;
+    }
     public virtual List<Bounds> GetBounds() {
         return new List<Bounds>();
     }

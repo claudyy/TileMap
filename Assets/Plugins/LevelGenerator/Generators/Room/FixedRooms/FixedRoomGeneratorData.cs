@@ -1,13 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System;
 using UnityEngine;
 using System.Linq;
-using ClaudeFehlen.Tileset.Pathfinding;
-using ClaudeFehlen.Tileset;
+using System;
 
-public class FixedRoomGeneratorOld : BaseLevelGenerator {
+public class FixedRoomGenerator : BaseLevelStructure {
     public List<FixedRoomData_Exit> roomExitDataList;
     public List<FixedRoomData_Entry> roomEntryDataList;
     public List<FixedRoomData_Shop> roomShopDataList;
@@ -24,108 +21,109 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
     public List<BaseFixedRoom> freeRooms;
     public TileLevelData floor;
     public TileLevelData wall;
-    Vector2Int center{
+    Vector2Int center {
         get {
             return new Vector2Int(levelSizeX / 2, levelSizeY / 2);
         }
     }
-    protected override IEnumerator RunTimeTryGenerate() {
+    List<BaseLevelStructure> structureList = new List<BaseLevelStructure>();
+    public override IEnumerator RunTimeTryGenerate(BaseLevelGenerator generator) {
         structureList = new List<BaseLevelStructure>();
 
         rooms = new BaseFixedRoom[levelSizeX * levelSizeY];
         for (int x = 0; x < levelSizeX; x++)
             for (int y = 0; y < levelSizeY; y++)
-                rooms[x + y *levelSizeX] = BaseFixedRoom.EmptyRoom(x,y);
+                rooms[x + y * levelSizeX] = BaseFixedRoom.EmptyRoom(x, y);
         freeRooms = new List<BaseFixedRoom>();
 
-        for (int x = 0; x < levelSizeX; x++) 
-            for (int y = 0; y < levelSizeY; y++) 
-                freeRooms.Add(BaseFixedRoom.EmptyRoom(x,y));
+        for (int x = 0; x < levelSizeX; x++)
+            for (int y = 0; y < levelSizeY; y++)
+                freeRooms.Add(BaseFixedRoom.EmptyRoom(x, y));
         yield return null;
 
 
         //placeExit
-        DebugCheckTimeStart("Place Exit");
+        //DebugCheckTimeStart("Place Exit");
         var exit = GetRandomRoomFromList(roomExitDataList).GetStructure() as FixedRoom_Exit;
         var exitPos = GetRandomRoomPos();
-        SetFixedRoom(exit,exitPos.x,exitPos.y);
+        SetFixedRoom(exit, exitPos.x, exitPos.y);
         if (exitPos == Vector2Int.one * -1 || exit == null) {
-            DebugTryFail(exit == null?"Couldnt find Exit Room":"Could find Position for exit");
+            //DebugTryFail(exit == null ? "Couldnt find Exit Room" : "Could find Position for exit");
             //return false;
         }
         yield return null;
-        DebugCheckTimeEnd();
+       // DebugCheckTimeEnd();
 
         //ChestRoom
-        DebugCheckTimeStart("Place Chest");
+        //DebugCheckTimeStart("Place Chest");
 
         var chest = GetRandomRoomFromList(roomChestDataList).GetStructure() as FixedRoom_Chest;
-        var chestPos = GetRandomFreeRoomPos((int)new Vector2(levelSizeX,levelSizeY).magnitude/3,exit);
+        var chestPos = GetRandomFreeRoomPos((int)new Vector2(levelSizeX, levelSizeY).magnitude / 3, exit);
         if (chestPos == Vector2Int.one * -1 || chest == null) {
-            DebugTryFail(chest == null ? "Couldnt find Chest Room" : "Could find Position for chest");
+            //DebugTryFail(chest == null ? "Couldnt find Chest Room" : "Could find Position for chest");
             //return false;
         }
         SetFixedRoom(chest, chestPos.x, chestPos.y);
         yield return null;
-        DebugCheckTimeEnd();
+        //DebugCheckTimeEnd();
 
 
         //PlaceShop
-        DebugCheckTimeStart("Place Shop");
+        //DebugCheckTimeStart("Place Shop");
 
         var shop = GetRandomRoomFromList(roomShopDataList).GetStructure() as FixedRoom_Shop;
-        var shopPos = GetRandomFreeRoomPos((int)new Vector2(levelSizeX, levelSizeY).magnitude / 3, chest,exit);
+        var shopPos = GetRandomFreeRoomPos((int)new Vector2(levelSizeX, levelSizeY).magnitude / 3, chest, exit);
         if (shopPos == Vector2Int.one * -1 || shop == null) {
-            DebugTryFail(exit == null ? "Couldnt find Shop Room" : "Could find Position for shop");
+            //DebugTryFail(exit == null ? "Couldnt find Shop Room" : "Could find Position for shop");
             //return false;
         }
         SetFixedRoom(shop, shopPos.x, shopPos.y);
         yield return null;
-        DebugCheckTimeEnd();
+        //DebugCheckTimeEnd();
 
 
         //Connect Rooms
-        DebugCheckTimeStart("Connection");
+        //DebugCheckTimeStart("Connection");
 
         if (GenerateConnection(chest, exit) == false) {
-            DebugTryFail( "Couldnt connect chest and Exit");
+            //DebugTryFail("Couldnt connect chest and Exit");
             //return false;
         }
         if (GenerateConnection(shop, exit) == false) {
-            DebugTryFail("Couldnt connect shop and Exit");
+            //DebugTryFail("Couldnt connect shop and Exit");
             //return false;
         }
         yield return null;
-        DebugCheckTimeEnd();
-        
+        //DebugCheckTimeEnd();
+
 
         //FillRest
-        DebugCheckTimeStart("Fill");
+        //DebugCheckTimeStart("Fill");
 
         int roomCount = UnityEngine.Random.Range(roomCountRange.x, roomCountRange.y);
         for (int i = 0; i < 50; i++) {
-            if (CountOfRooms() >= roomCount )
+            if (CountOfRooms() >= roomCount)
                 break;
             int corridorLength = UnityEngine.Random.Range(additionalCoridorLengthRange.x, additionalCoridorLengthRange.y);
             GenerateCorridor(corridorLength, roomCount);
             yield return null;
         }
         yield return null;
-        DebugCheckTimeEnd();
+        //DebugCheckTimeEnd();
 
 
         //Place Entry
-        DebugCheckTimeStart("Place Entry");
+        //DebugCheckTimeStart("Place Entry");
 
         var entry = GetRandomRoomFromList(roomEntryDataList).GetStructure() as FixedRoom_Entry;
         var entryPos = FindEntryPos(exit, (int)new Vector2(levelSizeX, levelSizeY).magnitude / 3);
         if (entryPos == Vector2Int.one * -1 || entry == null) {
-            DebugTryFail(entry == null ? "Couldnt find Entry Room" : "Could find Position for Entry");
+            //DebugTryFail(entry == null ? "Couldnt find Entry Room" : "Could find Position for Entry");
             //return false;
         }
         SetFixedRoom(entry, entryPos.x, entryPos.y);
         yield return null;
-        DebugCheckTimeEnd();
+        //DebugCheckTimeEnd();
 
         //GenerateDoor
         for (int x = 0; x < levelSizeX; x++) {
@@ -148,7 +146,7 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
 
         //return true;
     }
-    protected override void TryGenerate() {
+    public override void TryGenerate(BaseLevelGenerator generator) {
         structureList = new List<BaseLevelStructure>();
 
         rooms = new BaseFixedRoom[levelSizeX * levelSizeY];
@@ -163,58 +161,58 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
 
 
         //placeExit
-        DebugCheckTimeStart("Place Exit");
+       // DebugCheckTimeStart("Place Exit");
         var exit = GetRandomRoomFromList(roomExitDataList).GetStructure() as FixedRoom_Exit;
         var exitPos = GetRandomRoomPos();
         SetFixedRoom(exit, exitPos.x, exitPos.y);
         if (exitPos == Vector2Int.one * -1 || exit == null) {
-            DebugTryFail(exit == null ? "Couldnt find Exit Room" : "Could find Position for exit");
+            //DebugTryFail(exit == null ? "Couldnt find Exit Room" : "Could find Position for exit");
             //return false;
         }
-        DebugCheckTimeEnd();
+       // DebugCheckTimeEnd();
 
         //ChestRoom
-        DebugCheckTimeStart("Place Chest");
+       // DebugCheckTimeStart("Place Chest");
 
         var chest = GetRandomRoomFromList(roomChestDataList).GetStructure() as FixedRoom_Chest;
         var chestPos = GetRandomFreeRoomPos((int)new Vector2(levelSizeX, levelSizeY).magnitude / 3, exit);
         if (chestPos == Vector2Int.one * -1 || chest == null) {
-            DebugTryFail(chest == null ? "Couldnt find Chest Room" : "Could find Position for chest");
+           // DebugTryFail(chest == null ? "Couldnt find Chest Room" : "Could find Position for chest");
             //return false;
         }
         SetFixedRoom(chest, chestPos.x, chestPos.y);
-        DebugCheckTimeEnd();
+        //DebugCheckTimeEnd();
 
 
         //PlaceShop
-        DebugCheckTimeStart("Place Shop");
+        //DebugCheckTimeStart("Place Shop");
 
         var shop = GetRandomRoomFromList(roomShopDataList).GetStructure() as FixedRoom_Shop;
         var shopPos = GetRandomFreeRoomPos((int)new Vector2(levelSizeX, levelSizeY).magnitude / 3, chest, exit);
         if (shopPos == Vector2Int.one * -1 || shop == null) {
-            DebugTryFail(exit == null ? "Couldnt find Shop Room" : "Could find Position for shop");
+            //DebugTryFail(exit == null ? "Couldnt find Shop Room" : "Could find Position for shop");
             //return false;
         }
         SetFixedRoom(shop, shopPos.x, shopPos.y);
-        DebugCheckTimeEnd();
+        //DebugCheckTimeEnd();
 
 
         //Connect Rooms
-        DebugCheckTimeStart("Connection");
+        //DebugCheckTimeStart("Connection");
 
         if (GenerateConnection(chest, exit) == false) {
-            DebugTryFail("Couldnt connect chest and Exit");
+            //DebugTryFail("Couldnt connect chest and Exit");
             //return false;
         }
         if (GenerateConnection(shop, exit) == false) {
-            DebugTryFail("Couldnt connect shop and Exit");
+            //DebugTryFail("Couldnt connect shop and Exit");
             //return false;
         }
-        DebugCheckTimeEnd();
+        //DebugCheckTimeEnd();
 
 
         //FillRest
-        DebugCheckTimeStart("Fill");
+        //DebugCheckTimeStart("Fill");
 
         int roomCount = UnityEngine.Random.Range(roomCountRange.x, roomCountRange.y);
         for (int i = 0; i < 50; i++) {
@@ -223,20 +221,20 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
             int corridorLength = UnityEngine.Random.Range(additionalCoridorLengthRange.x, additionalCoridorLengthRange.y);
             GenerateCorridor(corridorLength, roomCount);
         }
-        DebugCheckTimeEnd();
+        //DebugCheckTimeEnd();
 
 
         //Place Entry
-        DebugCheckTimeStart("Place Entry");
+       // DebugCheckTimeStart("Place Entry");
 
         var entry = GetRandomRoomFromList(roomEntryDataList).GetStructure() as FixedRoom_Entry;
         var entryPos = FindEntryPos(exit, (int)new Vector2(levelSizeX, levelSizeY).magnitude / 3);
         if (entryPos == Vector2Int.one * -1 || entry == null) {
-            DebugTryFail(entry == null ? "Couldnt find Entry Room" : "Could find Position for Entry");
+           // DebugTryFail(entry == null ? "Couldnt find Entry Room" : "Could find Position for Entry");
             //return false;
         }
         SetFixedRoom(entry, entryPos.x, entryPos.y);
-        DebugCheckTimeEnd();
+        //DebugCheckTimeEnd();
 
         //GenerateDoor
         for (int x = 0; x < levelSizeX; x++) {
@@ -256,7 +254,6 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
                     structureList.Add(GetRoom(x, y));
 
     }
-
     public void ConnectDoorsWithTop(BaseFixedRoom room) {
         var n = GetRoom(room.fixedX, room.fixedY + 1);
         if (n == null || n.IsEmpty())
@@ -267,7 +264,7 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
     }
     public void ConnectDoorsWithBottom(BaseFixedRoom room) {
         var n = GetRoom(room.fixedX, room.fixedY - 1);
-        if (n== null || n.IsEmpty())
+        if (n == null || n.IsEmpty())
             return;
         if (room.bottomDoorCount != 0)
             return;
@@ -309,11 +306,11 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
             if (lefts[y] == true && rights[y] == true)
                 possibles.Add(y);
         }
-        int posY  = possibles[UnityEngine.Random.Range(0, possibles.Count)];
+        int posY = possibles[UnityEngine.Random.Range(0, possibles.Count)];
         left.SetDoorRight(posY);
         right.SetDoorLeft(posY);
     }
-    public void GenerateCorridor(int length,int maxRoomCount) {
+    public void GenerateCorridor(int length, int maxRoomCount) {
         var curRoom = GetEmptyRoomWithStandartNeighbor();
         if (curRoom == null)
             return;
@@ -331,7 +328,7 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
             curRoom = neighbour;
         }
     }
-    public bool GenerateConnection(BaseFixedRoom start , BaseFixedRoom end) {
+    public bool GenerateConnection(BaseFixedRoom start, BaseFixedRoom end) {
         var path = FindPath(start, end);
         if (path == null)
             return false;
@@ -346,12 +343,12 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
         return GetRandomRoomFromList(roomData).GetStructure() as BaseFixedRoom;
     }
     List<BaseFixedRoomData> RemoveDataThatHasNotTheRightDoors(List<BaseFixedRoomData> list, int targetX, int targetY) {
-        var top = IsFreePos(targetX, targetY + 1) ? null : GetRoom(targetX, targetY+1).roomData;
-        var bottom = IsFreePos(targetX, targetY - 1) ? null :  GetRoom(targetX, targetY - 1).roomData;
+        var top = IsFreePos(targetX, targetY + 1) ? null : GetRoom(targetX, targetY + 1).roomData;
+        var bottom = IsFreePos(targetX, targetY - 1) ? null : GetRoom(targetX, targetY - 1).roomData;
         var left = IsFreePos(targetX - 1, targetY) ? null : GetRoom(targetX - 1, targetY).roomData;
         var right = IsFreePos(targetX + 1, targetY) ? null : GetRoom(targetX + 1, targetY).roomData;
 
-        for (int i = list.Count-1; i >=0; i--) {
+        for (int i = list.Count - 1; i >= 0; i--) {
             if (bottom != null && DoorCompareSide(bottom.GetTopPossibleDoors(floor), list[i].GetBottomPossibleDoors(floor)) == false)
                 list.RemoveAt(i);
             if (top != null && DoorCompareSide(top.GetBottomPossibleDoors(floor), list[i].GetTopPossibleDoors(floor)) == false)
@@ -378,19 +375,19 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
         }
         return false;
     }
-    public BaseFixedRoom GetRoom(int x,int y) {
+    public BaseFixedRoom GetRoom(int x, int y) {
         if (IsOutOfBound(x, y))
             return null;
         return rooms[x + y * levelSizeX];
     }
-    public void SetFixedRoom(BaseFixedRoom room,int x,int y) {
+    public void SetFixedRoom(BaseFixedRoom room, int x, int y) {
         RemoveFreePos(x, y);
         room.SetFixedPos(x, y);
         rooms[x + y * levelSizeX] = room;
     }
-    public void RemoveFreePos(int x,int y) {
+    public void RemoveFreePos(int x, int y) {
         for (int i = 0; i < freeRooms.Count; i++) {
-            if(freeRooms[i].fixedX == x && freeRooms[i].fixedY == y) {
+            if (freeRooms[i].fixedX == x && freeRooms[i].fixedY == y) {
                 freeRooms.RemoveAt(i);
                 break;
             }
@@ -398,19 +395,19 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
         }
     }
     public bool IsFreePos(int x, int y) {
-        return GetRoom(x,y) == null || GetRoom(x, y).roomData == null;
+        return GetRoom(x, y) == null || GetRoom(x, y).roomData == null;
     }
     BaseFixedRoom GetEmptyRoomWithStandartNeighbor() {
         var list = new List<BaseFixedRoom>();
         for (int i = 0; i < rooms.Length; i++) {
-            if (HaveConnectionToStandartRoom(rooms[i]) && IsSpecialRoom(rooms[i]) == false&& HaveSpecialRoomAsNeighbour(rooms[i]) == false)
+            if (HaveConnectionToStandartRoom(rooms[i]) && IsSpecialRoom(rooms[i]) == false && HaveSpecialRoomAsNeighbour(rooms[i]) == false)
                 list.Add(rooms[i]);
         }
         if (list.Count == 0)
             return null;
-        return list[UnityEngine.Random.Range(0,list.Count)];
+        return list[UnityEngine.Random.Range(0, list.Count)];
     }
-    Vector2Int FindEntryPos(BaseFixedRoom exit,float minDistance) {
+    Vector2Int FindEntryPos(BaseFixedRoom exit, float minDistance) {
         var list = new List<BaseFixedRoom>();
         for (int i = 0; i < rooms.Length; i++) {
             var posExit = new Vector2Int(exit.fixedX, exit.fixedX);
@@ -419,9 +416,9 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
                 list.Add(rooms[i]);
         }
         if (list.Count == 0)
-            return Vector2Int.one*-1;
+            return Vector2Int.one * -1;
         var r = list[UnityEngine.Random.Range(0, list.Count)];
-        return new Vector2Int(r.fixedX,r.fixedY);
+        return new Vector2Int(r.fixedX, r.fixedY);
     }
     public Vector2Int GetRandomRoomPos() {
         return new Vector2Int(UnityEngine.Random.Range(0, levelSizeX), UnityEngine.Random.Range(0, levelSizeX));
@@ -429,10 +426,10 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
     public Vector2Int GetRandomFreeRoomPos() {
         int i = UnityEngine.Random.Range(0, freeRooms.Count);
         if (freeRooms[i].IsEmpty() == false)
-            return Vector2Int.one*-1;
+            return Vector2Int.one * -1;
         return new Vector2Int(freeRooms[i].fixedX, freeRooms[i].fixedY);
     }
-    public Vector2Int GetRandomFreeRoomPos(int distance,BaseFixedRoom from) {
+    public Vector2Int GetRandomFreeRoomPos(int distance, BaseFixedRoom from) {
         Vector2 fromPos = new Vector2(from.fixedX, from.fixedY);
         Vector2 targetPos = Vector2.zero;
         targetPos = fromPos + GetRandomDir(from) * distance;
@@ -448,7 +445,7 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
         Vector2 fromPos = new Vector2(from.fixedX, from.fixedY);
         Vector2 fromPos2 = new Vector2(from2.fixedX, from2.fixedY);
         Vector2 targetPos = Vector2.zero;
-        targetPos = (fromPos+ fromPos2)/2 + (GetRandomDir(from)+ GetRandomDir(from2))*distance/2;
+        targetPos = (fromPos + fromPos2) / 2 + (GetRandomDir(from) + GetRandomDir(from2)) * distance / 2;
 
         Vector2Int pos = new Vector2Int((int)targetPos.x, (int)targetPos.y);
 
@@ -472,19 +469,17 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
         }
         return dir;
     }
-    bool IsOutOfBound(int x,int y) {
+    bool IsOutOfBound(int x, int y) {
         if (x < 0 || x >= levelSizeX)
             return true;
         if (y < 0 || y >= levelSizeY)
             return true;
         return false;
     }
-    public T GetRandomRoomFromList<T>(List<T> list){
+    public T GetRandomRoomFromList<T>(List<T> list) {
         return list[UnityEngine.Random.Range(0, list.Count)];
     }
-    protected override bool CheckGeneratedResult(List<BaseLevelStructure> structure) {
-        return base.CheckGeneratedResult(structure);
-    }
+
 
 
 
@@ -506,7 +501,7 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
             openSet.RemoveAt(0);
             closedSet.Add(currentNode);
 
-            if (HaveRoomAsNeighbour(currentNode,targetRoom) || HaveConnectionToStandartRoom(currentNode)) {
+            if (HaveRoomAsNeighbour(currentNode, targetRoom) || HaveConnectionToStandartRoom(currentNode)) {
                 targetRoom.parent = currentNode;
                 pathSuccess = true;
                 break;
@@ -529,7 +524,7 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
                 }
             }
         }
-        
+
 
         if (pathSuccess) {
             return waypoints = RetracePath(startRoom, targetRoom);
@@ -538,7 +533,7 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
         //requestManager.FinishedProcessingPath(waypoints, pathSuccess);
 
     }
-    
+
     Vector2Int[] RetracePath(BaseFixedRoom startNode, BaseFixedRoom endNode) {
         List<BaseFixedRoom> path = new List<BaseFixedRoom>();
         BaseFixedRoom currentNode = endNode;
@@ -558,7 +553,7 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
 
     }
     List<BaseFixedRoom> GetFreeNeighbours(BaseFixedRoom from) {
-        var list =  new List<BaseFixedRoom>();
+        var list = new List<BaseFixedRoom>();
         int x = from.fixedX;
         int y = from.fixedY;
         if (IsOutOfBound(x - 1, y) == false && IsFreePos(x - 1, y))
@@ -566,9 +561,9 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
         if (IsOutOfBound(x + 1, y) == false && IsFreePos(x + 1, y))
             list.Add(GetRoom(x + 1, y));
         if (IsOutOfBound(x, y - 1) == false && IsFreePos(x, y - 1))
-            list.Add(GetRoom(x, y -1));
-        if (IsOutOfBound(x, y+1) == false && IsFreePos(x, y+1))
-            list.Add(GetRoom(x, y+1));
+            list.Add(GetRoom(x, y - 1));
+        if (IsOutOfBound(x, y + 1) == false && IsFreePos(x, y + 1))
+            list.Add(GetRoom(x, y + 1));
         return list;
     }
     List<BaseFixedRoom> GetNeighbours(BaseFixedRoom from) {
@@ -595,7 +590,7 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
         return randomizedList;
     }
     List<BaseFixedRoom> RemoveRoomWithMoreThanOneNeighbour(List<BaseFixedRoom> list) {
-        for (int i = list.Count-1; i >=0 ; i--) {
+        for (int i = list.Count - 1; i >= 0; i--) {
             if (GetFreeNeighbours(list[i]).Count < 3)
                 list.RemoveAt(i);
         }
@@ -617,7 +612,7 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
         }
         return false;
     }
-    bool HaveRoomAsNeighbour(BaseFixedRoom room,BaseFixedRoom neighbour) {
+    bool HaveRoomAsNeighbour(BaseFixedRoom room, BaseFixedRoom neighbour) {
         var list = GetNeighbours(room);
         for (int i = 0; i < list.Count; i++) {
             if (list[i] == neighbour)
@@ -635,10 +630,10 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
     }
     BaseFixedRoom GetSpecialRoomNeighbour(BaseFixedRoom target) {
         var list = GetNeighbours(target);
-        for (int i = 0; i < list.Count; i++) 
+        for (int i = 0; i < list.Count; i++)
             if (IsSpecialRoom(list[i]))
                 return list[i];
-        
+
         return null;
     }
     bool HaveSpecialRoomAsNeighbour(BaseFixedRoom target) {
@@ -677,5 +672,28 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
             if (rooms[i].IsEmpty() == false)
                 count++;
         return count;
+    }
+}
+[CreateAssetMenu(fileName = "FixedRoomGenerator",menuName ="TileMap/LevelGenerator/FixedRoom/Generator")]
+public class FixedRoomGeneratorData : BaseLevelStructureData {
+    public List<FixedRoomData_Exit> roomExitDataList;
+    public List<FixedRoomData_Entry> roomEntryDataList;
+    public List<FixedRoomData_Shop> roomShopDataList;
+    public List<FixedRoomData_Chest> roomChestDataList;
+    public List<FixedRoomData_Standart> roomStandartDataList;
+    public int fixedRoomSizeX = 28;
+    public int fixedRoomSizeY = 18;
+
+    public int levelSizeX;
+    public int levelSizeY;
+    public Vector2Int roomCountRange;
+    public Vector2Int additionalCoridorLengthRange;
+    public TileLevelData floor;
+    public TileLevelData wall;
+
+    public override BaseLevelStructure GetStructure() {
+        var s = new FixedRoomGenerator();
+        s.Init(this);
+        return s;
     }
 }

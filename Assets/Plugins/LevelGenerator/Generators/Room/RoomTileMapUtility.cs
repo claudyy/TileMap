@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 public class RoomTileMapUtility : MonoBehaviour {
+    public SaveUtility saveUtility;
     public Tilemap tilemap;
     public LevelTilemap level;
     public Structure_BaseRoomData room;
@@ -38,6 +39,18 @@ public class RoomTileMapUtility : MonoBehaviour {
     }
 
     public void CreateRoom() {
-        throw new NotImplementedException();
+        var saveFile = level.GetSaveDataFromTileMap();
+        CreateRoom(saveFile);
+    }
+    public void CreateRoom(TileMapSaveData saveFile) {
+#if UNITY_EDITOR
+        var room = new BaseFixedRoomData();
+        room.name = saveUtility.fileName;
+        room.CreateRoomFromSaveFill(saveFile);
+        UnityEditor.AssetDatabase.CreateAsset(room, saveUtility.path);
+        UnityEditor.AssetDatabase.SaveAssets();
+#endif
+    }
+    public void CreateRoomFromTextureList() {
     }
 }
