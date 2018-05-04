@@ -125,7 +125,7 @@ public class BiomStructure : BaseLevelStructure {
         base.Init(data);
         biomData = data as BiomData;
     }
-    public override IEnumerator RunTimeGenerate(GeneratorMapData map) {
+    public override IEnumerator RunTimeGenerate(GeneratorMapData map, MonoBehaviour mono) {
         int startX = posX;
         int startY = posY;
 

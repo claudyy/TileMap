@@ -6,7 +6,9 @@ public class SimpleGenerator : BaseLevelGenerator {
     
     public BaseLevelStructureData structure;
     protected override IEnumerator RunTimeTryGenerate() {
-        structureList = new List<BaseLevelStructure>(1) {structure.GetStructure()};
+        var s = structure.GetStructure();
+        yield return StartCoroutine(s.RunTimeTryGenerate(this,this));
+        structureList = new List<BaseLevelStructure>(1) {s};
         yield return null;
     }
     protected override void TryGenerate() {

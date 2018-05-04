@@ -32,48 +32,15 @@ public class BaseRoom : BaseLevelStructure {
 
 
 
-    public override IEnumerator RunTimeGenerate(GeneratorMapData map) {
-        base.RunTimeGenerate(map);
+    public override IEnumerator RunTimeGenerate(GeneratorMapData map, MonoBehaviour mono) {
         int startX = posX;
         int startY = posY;
         for (int x = 0; x < roomData.sizeX; x++) {
             for (int y = 0; y < roomData.sizeY; y++) {
-                if(y == 0) {
-                    if(BottomDoorPos[x] == true)
-                        map.OverrideTile(startX + x, startY + y, roomData.floor);
-                    else
-                        map.OverrideTile(startX + x, startY + y, roomData.wall);
-
-                    continue;
-                }
-                if (x == 0) {
-                    if (LeftDoorPos[y] == true)
-                        map.OverrideTile(startX + x, startY + y, roomData.floor);
-                    else
-                        map.OverrideTile(startX + x, startY + y, roomData.wall);
-
-                    continue;
-                }
-                if (x == roomData.sizeX-1) {
-                    if (RightDoorPos[y] == true)
-                        map.OverrideTile(startX + x, startY + y, roomData.floor);
-                    else
-                        map.OverrideTile(startX + x, startY + y, roomData.wall);
-
-                    continue;
-                }
-                if (y == roomData.sizeY - 1) {
-                    if (TopDoorPos[x] == true)
-                        map.OverrideTile(startX + x, startY + y, roomData.floor);
-                    else
-                        map.OverrideTile(startX + x, startY + y, roomData.wall);
-
-                    continue;
-                }
-                map.OverrideTile(startX + x, startY + y, roomData.roomTileList[x * y]);
-                yield return null;
+                OverrideTile(map,x, y,startX,startY);
             }
         }
+        yield return null;
     }
     public override void Generate(GeneratorMapData map) {
         base.Generate(map);
@@ -184,6 +151,20 @@ public class Structure_BaseRoomData : BaseLevelStructureData {
                 bottomPossibleDoors.Add(true);
             else
                 bottomPossibleDoors.Add(false);
+        }
+        leftPossibleDoors = new List<bool>();
+        for (int i = 0; i < sizeY; i++) {
+            if (PossibleDoorLeft(i))
+                leftPossibleDoors.Add(true);
+            else
+                leftPossibleDoors.Add(false);
+        }
+        rightPossibleDoors = new List<bool>();
+        for (int i = 0; i < sizeY; i++) {
+            if (PossibleDoorRight(i))
+                rightPossibleDoors.Add(true);
+            else
+                rightPossibleDoors.Add(false);
         }
     }
     public override BaseLevelStructure GetStructure() {

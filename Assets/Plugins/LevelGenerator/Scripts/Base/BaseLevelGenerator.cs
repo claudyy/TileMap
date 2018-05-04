@@ -78,6 +78,7 @@ public class GeneratorMapData {
 [RequireComponent(typeof(LevelTilemap))]
 [ExecuteInEditMode()]
 public class BaseLevelGenerator : MonoBehaviour {
+    public SaveUtility saveUtiliy;
     public TileLevelData defaultTileData;
     public LevelTilemap level;
     public StringBuilder result;
@@ -85,6 +86,8 @@ public class BaseLevelGenerator : MonoBehaviour {
     protected double time;
     protected Stopwatch stopwatch;
     public bool fillWithDefault;
+    public bool CreateSaveFile;
+    public bool generateOnAwake;
     protected int _progress;
     public virtual float GetProgress() {
         return (float)_progress / MaxProgressStep;
@@ -94,13 +97,18 @@ public class BaseLevelGenerator : MonoBehaviour {
             return 5;
         }
     }
+    protected virtual void Awake() {
+        if (generateOnAwake) {
+            StartCoroutine(RunTimeGenerateMap());
+        }
+    }
     protected virtual IEnumerator RunTimeTryGenerate() {
         structureList = new List<BaseLevelStructure>();
         yield return null;
     }
     protected virtual IEnumerator RunTimeGenerate(List<BaseLevelStructure> structure, GeneratorMapData map) {
         for (int i = 0; i < structure.Count; i++) {
-            yield return StartCoroutine(structure[i].RunTimeGenerate(map));
+            yield return StartCoroutine(structure[i].RunTimeGenerate(map,this));
         }
     }
     protected virtual bool CheckGeneratedResult(List<BaseLevelStructure> structure) {
@@ -242,7 +250,8 @@ public class BaseLevelGenerator : MonoBehaviour {
 
         DebugCheckTimeStart("UpdateViews");
         level.ApplySaveFileToMap(map.GetNewSaveFile());
-
+        if (CreateSaveFile)
+            level.CreateSaveFile(map.GetNewSaveFile(), saveUtiliy);
         _progress++;
         DebugCheckTimeEnd();
 

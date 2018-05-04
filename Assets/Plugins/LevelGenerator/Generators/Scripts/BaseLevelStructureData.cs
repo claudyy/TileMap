@@ -16,7 +16,7 @@ public class BaseLevelStructure{
         }
         return false;
     }
-    public virtual IEnumerator RunTimeGenerate(GeneratorMapData map) {
+    public virtual IEnumerator RunTimeGenerate(GeneratorMapData map, MonoBehaviour mono) {
         yield return null;
     }
     public virtual void Generate(GeneratorMapData map) {
@@ -25,7 +25,7 @@ public class BaseLevelStructure{
     public virtual void TryGenerate(BaseLevelGenerator generator) {
 
     }
-    public virtual IEnumerator RunTimeTryGenerate(BaseLevelGenerator generator) {
+    public virtual IEnumerator RunTimeTryGenerate(BaseLevelGenerator generator, MonoBehaviour mono) {
         yield return null;
     }
     public virtual List<Bounds> GetBounds() {

@@ -8,7 +8,14 @@ public class SaveUtility {
     public string GetPath() {
         return Application.dataPath + "/" + path + fileName + ".xml";
     }
-    public string GetPath(string fileType) {
+    public string GetPath(string fileType,bool withApplicationPath = true) {
+        var fileName = this.fileName;
+        if (withApplicationPath == false)
+            return path + fileName + "." + fileType;
         return Application.dataPath + "/" + path + fileName + "."+ fileType;
+    }
+    public string GetAssetPath(string fileType) {
+        var path = this.path + fileName + "." + fileType;
+        return UnityEditor.AssetDatabase.GenerateUniqueAssetPath(path);
     }
 }

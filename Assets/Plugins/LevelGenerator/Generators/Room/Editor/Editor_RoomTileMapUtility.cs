@@ -15,5 +15,7 @@ public class Editor_RoomTileMapUtility : Editor {
             utility.ApplyToRoom();
         if (GUILayout.Button("Create Room"))
             utility.CreateRoom();
+        if (GUILayout.Button("Create Rooms from TextureList"))
+            utility.CreateRoomFromTextureList();
     }
 }

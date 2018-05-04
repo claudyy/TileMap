@@ -3,14 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEditor;
 public class RoomTileMapUtility : MonoBehaviour {
     public SaveUtility saveUtility;
-    public Tilemap tilemap;
     public LevelTilemap level;
     public Structure_BaseRoomData room;
     public TileLevelData defaultData;
     public TileLevelData roomWall;
     public TileLevelData roomFloor;
+    public List<Texture2D> textureList;
     // Use this for initialization
     void Start () {
 		
@@ -32,10 +33,7 @@ public class RoomTileMapUtility : MonoBehaviour {
 
     public void ApplyToRoom() {
         var saveFile = level.GetSaveDataFromTileMap();
-        room.CreateRoomFromSaveFill(saveFile);
-        room.floor = roomFloor;
-        room.wall = roomWall;
-        room.UpdateDoors();
+        ApplyToRoom(room, saveFile);
     }
 
     public void CreateRoom() {
@@ -46,11 +44,23 @@ public class RoomTileMapUtility : MonoBehaviour {
 #if UNITY_EDITOR
         var room = new BaseFixedRoomData();
         room.name = saveUtility.fileName;
-        room.CreateRoomFromSaveFill(saveFile);
-        UnityEditor.AssetDatabase.CreateAsset(room, saveUtility.path);
-        UnityEditor.AssetDatabase.SaveAssets();
+        ApplyToRoom(room, saveFile);
+        UnityEditor.AssetDatabase.CreateAsset(room, saveUtility.GetAssetPath("asset"));
+        //UnityEditor.AssetDatabase.SaveAssets();
 #endif
     }
     public void CreateRoomFromTextureList() {
+        TileMapEditorUtility utility = new TileMapEditorUtility();
+        for (int i = 0; i < textureList.Count; i++) {
+            CreateRoom(utility.CreateSaveDataFromTexutre(textureList[i]));
+        }
+    }
+
+    void ApplyToRoom(Structure_BaseRoomData room, TileMapSaveData saveFile) {
+        room.CreateRoomFromSaveFill(saveFile);
+        room.floor = roomFloor;
+        room.wall = roomWall;
+        room.UpdateDoors();
+
     }
 }

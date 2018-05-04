@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a203723e0f54d2c4c8208c94c3c40294, type: 3}
+  m_Name: FixedRoomGenerator
+  m_EditorClassIdentifier: 
+  roomExitDataList:
+  - {fileID: 11400000, guid: 9fe68bf83ebbd944a8fa620ed9ff983b, type: 2}
+  roomEntryDataList:
+  - {fileID: 11400000, guid: acbf3a2044584d6478039eb5f1c7e82b, type: 2}
+  roomShopDataList:
+  - {fileID: 11400000, guid: c7b90cc4a34912649a24215de3b32ab3, type: 2}
+  roomChestDataList:
+  - {fileID: 11400000, guid: c0ae48a55bc78534b822421302a83580, type: 2}
+  roomStandartDataList:
+  - {fileID: 11400000, guid: f88a789d016f2e642aad9e192b326262, type: 2}
+  - {fileID: 11400000, guid: befb65d53f5521540a9ec8a5669d6706, type: 2}
+  - {fileID: 11400000, guid: 809ed841a0b2c124ea2048ca0c071285, type: 2}
+  - {fileID: 11400000, guid: 082081a58abf0af439b27808e88bdbd9, type: 2}
+  - {fileID: 11400000, guid: 8ce163aa889515d4b9f20beed1e8fd10, type: 2}
+  - {fileID: 11400000, guid: c8015d09039a53e4fa8fa14413dbd410, type: 2}
+  defaultStandartRoom: {fileID: 11400000, guid: f88a789d016f2e642aad9e192b326262,
+    type: 2}
+  fixedRoomSizeX: 18
+  fixedRoomSizeY: 12
+  levelSizeX: 14
+  levelSizeY: 10
+  roomCountRange: {x: 16, y: 22}
+  additionalCoridorLengthRange: {x: 2, y: 4}
+  floor: {fileID: 11400000, guid: 6ff3bcd3ea37423408e7f0bf2090f383, type: 2}
+  wall: {fileID: 11400000, guid: 269dae806194b2d419fd71deb3256622, type: 2}
