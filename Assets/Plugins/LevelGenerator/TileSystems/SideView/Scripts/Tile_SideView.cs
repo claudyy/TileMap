@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class Tile_SideView : BaseTile {
+public class Tile_SideView : BaseLevelTile {
 
 
 }

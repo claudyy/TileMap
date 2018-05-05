@@ -4,8 +4,8 @@ using UnityEngine;
 using System.Linq;
 using System.IO;
 public class TileMapEditorUtility {
-
-  public  void CreateTextureFromSaveFile(TileMapSaveData st, SaveUtility saveUtility, LevelTilemap target) {
+#if UNITY_EDITOR
+    public  void CreateTextureFromSaveFile(TileMapSaveData st, SaveUtility saveUtility, LevelTilemap target) {
         Texture2D tex = new Texture2D(st.sizeX, st.sizeY);
         var datas = target.GetTileLevelDataFromSaveFile(st);
         for (int x = 0; x < st.sizeX; x++) {
@@ -28,7 +28,7 @@ public class TileMapEditorUtility {
 
     }
     public TileMapSaveData CreateSaveDataFromTexutre(Texture2D loadTexture) {
-        var allData = Resources.LoadAll("", typeof(TileLevelData)).Cast<TileLevelData>().ToArray();
+        var allData = Resources.LoadAll("", typeof(LevelTileData)).Cast<LevelTileData>().ToArray();
         TileMapSaveData st = new TileMapSaveData();
         st.sizeX = loadTexture.width;
         st.sizeY = loadTexture.height;
@@ -42,8 +42,8 @@ public class TileMapEditorUtility {
         st.tiles = datas;
         return st;
     }
-    public TileSaveData GetDataFromColor(Color c, TileLevelData[] allData) {
-        TileLevelData data = null;
+    public TileSaveData GetDataFromColor(Color c, LevelTileData[] allData) {
+        LevelTileData data = null;
         for (int i = 0; i < allData.Length; i++) {
             if (allData[i].editorColor == c) {
                 data = allData[i];
@@ -52,4 +52,5 @@ public class TileMapEditorUtility {
         }
         return new TileSaveData(data);
     }
+#endif
 }

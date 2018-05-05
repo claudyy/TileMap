@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TopDownTile : BaseTile {
+public class TopDownTile : BaseLevelTile {
     public TopDownTile() {
 
     }

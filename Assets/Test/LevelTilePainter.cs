@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class LevelTilePainter : MonoBehaviour {
     public LevelTilemap level;
-    public List<TileLevelData> brushes;
+    public List<LevelTileData> brushes;
 }

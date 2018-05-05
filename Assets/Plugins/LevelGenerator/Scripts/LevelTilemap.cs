@@ -18,7 +18,7 @@ public class TileSaveData {
     public TileSaveData() {
 
     }
-    public TileSaveData(TileLevelData data) {
+    public TileSaveData(LevelTileData data) {
         if (data == null)
             return;
         tileDataName = data.name;
@@ -35,7 +35,7 @@ public class TileMapSaveData {
 }
 
 public abstract class LevelTilemap : MonoBehaviour {
-    public TileLevelData defaultTileData;
+    public LevelTileData defaultTileData;
     public Tilemap tilemap;
     public GameObject grid;
     public Dictionary<int,SubTileMap> tileMapList;
@@ -73,7 +73,8 @@ public abstract class LevelTilemap : MonoBehaviour {
     }
     #region Unity Tilemap Utility
     public virtual void SetTile(Vector3Int pos, TileBase tile) {
-        tilemap.SetTile(IndexToTilemap(pos), tile);
+        if(tilemap.GetTile(IndexToTilemap(pos)) != tile)
+            tilemap.SetTile(IndexToTilemap(pos), tile);
     }
     public virtual void SetTiles(Vector3Int[] pos, TileBase[] tiles) {
         Vector3Int[] worldpos = new Vector3Int[pos.Length];
@@ -103,7 +104,7 @@ public abstract class LevelTilemap : MonoBehaviour {
         }
         return size;
     }
-    public TileLevelData LoadDataFromTileMap(Vector3Int pos, TileLevelData[] allData) {
+    public LevelTileData LoadDataFromTileMap(Vector3Int pos, LevelTileData[] allData) {
        var tile = tilemap.GetTile(pos);
         for (int i = 0; i < allData.Length; i++) {
             if (tile == allData[i].tile)
@@ -118,7 +119,7 @@ public abstract class LevelTilemap : MonoBehaviour {
         st.sizeY = size.y;
         Vector3Int pos = new Vector3Int(0, 0, 0);
         TileSaveData[] datas = new TileSaveData[size.x * size.y];
-        var allData = Resources.LoadAll("", typeof(TileLevelData)).Cast<TileLevelData>().ToArray();
+        var allData = Resources.LoadAll("", typeof(LevelTileData)).Cast<LevelTileData>().ToArray();
         for (int x = 0; x < size.x; x++) {
             for (int y = 0; y < size.y; y++) {
                 pos.x = x;
@@ -181,9 +182,9 @@ public abstract class LevelTilemap : MonoBehaviour {
             return;
         var tiles = new TileBase[chunkSize* chunkSize];
         var pos = new Vector3Int[chunkSize* chunkSize];
-        BaseTile tileTemp = null;
+        BaseLevelTile tileTemp = null;
         TileBase tileViewTemp = null;
-        TileLevelData dataTemp = null;
+        LevelTileData dataTemp = null;
         for (int x = 0; x < chunkSize; x++) {
             for (int y = 0; y < chunkSize; y++) {
                 vec3IntTemp.x = x + cx * chunkSize;
@@ -215,7 +216,7 @@ public abstract class LevelTilemap : MonoBehaviour {
         GetTileMap(x, y).UpdateInView(this);
     }
     
-    public virtual void LoadTileFirstTime(BaseTile tile) {
+    public virtual void LoadTileFirstTime(BaseLevelTile tile) {
 
     }
 
@@ -238,9 +239,9 @@ public abstract class LevelTilemap : MonoBehaviour {
     public void Load(TileMapSaveData st) {
         if(updateVisibleCoroutine != null)
             StopCoroutine(updateVisibleCoroutine);
-
+        ClearTilemap();
         Resize(st.sizeX, st.sizeY);//inits chunk
-        TileLevelData tile = null;
+        LevelTileData tile = null;
         //UnityEngine.Debug.Log(sizeX + sizeY * sizeX);
         //UnityEngine.Debug.Log(st.tiles.Length);
         StringBuilder str = new StringBuilder();
@@ -251,7 +252,7 @@ public abstract class LevelTilemap : MonoBehaviour {
         str.Append("Load Data : ");
         w.Reset();
         w.Start();
-        var allData = Resources.LoadAll("", typeof(TileLevelData)).Cast<TileLevelData>().ToArray();
+        var allData = Resources.LoadAll("", typeof(LevelTileData)).Cast<LevelTileData>().ToArray();
         for (int x = 0; x < st.sizeX; x++) {
             for (int y = 0; y < st.sizeY; y++) {
                 tile = GetDataFromList(st.tiles[x + y * st.sizeX].tileDataName, allData);
@@ -290,17 +291,18 @@ public abstract class LevelTilemap : MonoBehaviour {
 
 
         str.AppendLine(" Duration: " + w.Elapsed);
-
+#if UNITY_EDITOR
         UnityEngine.Debug.Log(str.ToString());
+#endif
         if(Application.isEditor == false) {
             updateVisibleCoroutine = StartCoroutine(UpdateVisible());
             updateAllCoroutine = StartCoroutine(UpdateAllTiles());
         }
 
     }
-    public TileLevelData[] GetTileLevelDataFromSaveFile(TileMapSaveData st) {
-        var allData = Resources.LoadAll("", typeof(TileLevelData)).Cast<TileLevelData>().ToArray();
-        var tiles = new TileLevelData[st.sizeX * st.sizeY];
+    public LevelTileData[] GetTileLevelDataFromSaveFile(TileMapSaveData st) {
+        var allData = Resources.LoadAll("", typeof(LevelTileData)).Cast<LevelTileData>().ToArray();
+        var tiles = new LevelTileData[st.sizeX * st.sizeY];
         for (int x = 0; x < st.sizeX; x++) {
             for (int y = 0; y < st.sizeY; y++) {
                 tiles[x+y*st.sizeX] = GetDataFromList(st.tiles[x + y * st.sizeX].tileDataName, allData);
@@ -310,8 +312,8 @@ public abstract class LevelTilemap : MonoBehaviour {
     }
     public void ApplySaveFileToMap(TileMapSaveData st) {
         ClearTilemap();
-        var allData = Resources.LoadAll("", typeof(TileLevelData)).Cast<TileLevelData>().ToArray();
-        TileLevelData tile = null;
+        var allData = Resources.LoadAll("", typeof(LevelTileData)).Cast<LevelTileData>().ToArray();
+        LevelTileData tile = null;
         Vector3Int pos = new Vector3Int(0,0,0);
         for (int x = 0; x < st.sizeX; x++) {
             for (int y = 0; y < st.sizeY; y++) {
@@ -333,7 +335,7 @@ public abstract class LevelTilemap : MonoBehaviour {
 
         int cx = 0;
         int cy = 0;
-        TileLevelData tile = null;
+        LevelTileData tile = null;
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
                 cx = PosToChunk(x, y).x;
@@ -359,7 +361,7 @@ public abstract class LevelTilemap : MonoBehaviour {
     }
     #endregion
 
-    public void AddGameObjectToTile(BaseTile tile,BaseTileMapGameobject prefab) {
+    public void AddGameObjectToTile(BaseLevelTile tile,BaseTileMapGameobject prefab) {
         var go = Instantiate(prefab, transform);
         vec3IntTemp.x = tile.pos.x;
         vec3IntTemp.y = tile.pos.y;
@@ -377,7 +379,7 @@ public abstract class LevelTilemap : MonoBehaviour {
         return index;
     }
 
-    public TileLevelData GetDataFromList(string name, TileLevelData[] list) {
+    public LevelTileData GetDataFromList(string name, LevelTileData[] list) {
         if (name == "")
             return null;
         for (int i = 0; i < list.Length; i++) {
@@ -406,7 +408,6 @@ public abstract class LevelTilemap : MonoBehaviour {
         int chunkY = Mathf.CeilToInt((float)y / chunkSize);
         levelChunkX = chunkX;
         levelChunkY = chunkY;
-        UnityEngine.Debug.Log(x + " : " + chunkX + " / " + chunkSize);
         GenerateTileSets();
     }
 
@@ -427,16 +428,16 @@ public abstract class LevelTilemap : MonoBehaviour {
     public void UpdateViews(int x, int y) {
         GetTileMap(PosToChunk(x,y).x, PosToChunk(x, y).y).UpdateViewChunke(this);
     }
-    public T GetTile<T>(Vector2Int pos) where T: BaseTile {
+    public T GetTile<T>(Vector2Int pos) where T: BaseLevelTile {
         return GetTile<T>(pos.x,pos.y);
     }
-    public BaseTile GetITile(Vector2Int pos) {
-        return GetTile<BaseTile>(pos.x, pos.y);
+    public BaseLevelTile GetITile(Vector2Int pos) {
+        return GetTile<BaseLevelTile>(pos.x, pos.y);
     }
-    public BaseTile GetITile(int x, int y) {
-        return GetTile<BaseTile>(x, y);
+    public BaseLevelTile GetITile(int x, int y) {
+        return GetTile<BaseLevelTile>(x, y);
     }
-    public T GetTile<T>(int x, int y) where T: BaseTile {
+    public T GetTile<T>(int x, int y) where T: BaseLevelTile {
         //if (x >= sizeX || y >= sizeY || x < 0 || y < 0)
         //    return LevelTile.Empty;
         int posX = x % chunkSize;
@@ -502,29 +503,43 @@ public abstract class LevelTilemap : MonoBehaviour {
         var tilemap = GetTileMap(PosToChunk(pos).x, PosToChunk(pos).y);
         tilemap.Erase(PosToPosInChunk(pos),this );
     }
-    public void OverrideTile(int x, int y, TileLevelData data)
+    public virtual void OverrideTile(int x, int y, LevelTileData data)
     {
         var tilemap = GetTileMap(PosToChunk(x,y).x, PosToChunk(x,y).y);
-
-        if (data != null)
-            tilemap.OverrideTile(PosToPosInChunk(x,y).x, PosToPosInChunk(x, y).y,this, data);
-        else
+        if (data == null) {
             Erase(new Vector2Int(x, y));
-    }
-    public void OverrideTile(Vector2Int pos,TileLevelData data)
-    {
-        var tilemap = GetTileMap(PosToChunk(pos).x, PosToChunk(pos).y);
+            return;
+        }
+        RemoveTile( x, y);
+        var tile = GetITile(x, y);
+        tile.OverrideData(this, data, x, y);
+        if (tile.HaveBehaviorUpdate())
+            tilemap.updateTiles.Add(tile);
+        if (tile.HaveBehaviorViewUpdate())
+            tilemap.updateTilesInView.Add(tile);
+        //OverrideTile(tile);
+        //UpdateTile(x, y, this);
 
-        if (data != null)
-            tilemap.OverrideTile(PosToPosInChunk(pos).x, PosToPosInChunk(pos).y,this, data);
-        else
-            Erase(new Vector2Int(pos.x, pos.y));
     }
-    public void OverrideDataNameTile(int x, int y, TileLevelData data) {
+
+    public void OverrideTile(Vector2Int pos,LevelTileData data)
+    {
+        OverrideTile(pos.x, pos.y, data);
+    }
+    public void OverrideDataNameTile(int x, int y, LevelTileData data) {
         var tilemap = GetTileMap(PosToChunk(x,y).x, PosToChunk(x,y).y);
         tilemap.OverrideDataNameTile(PosToPosInChunk(x, y).x, PosToPosInChunk(x, y).y, data);
     }
+    void RemoveTile(int x, int y) {
+        var tilemap = GetTileMap(PosToChunk(x, y).x, PosToChunk(x, y).y);
 
+        var tile = GetITile(x, y);
+        tile.Remove(this);
+        if (tile.HaveBehaviorUpdate())
+            tilemap.updateTiles.Remove(tile);
+        if (tile.HaveBehaviorViewUpdate())
+            tilemap.updateTilesInView.Remove(tile);
+    }
     public bool IsEmpty(int x, int y){
         if (GetITile(x, y).data == null)
             return true;
@@ -560,14 +575,12 @@ public abstract class LevelTilemap : MonoBehaviour {
         }
     }
     #endregion
-    protected Vector3Int vec3IntTemp;
-    public abstract BaseTile CreateTile(Vector3Int pos, TileLevelData data);
-    public virtual void UpdateTile(BaseTile tile) {
-        if (tile.needUpdate == false)
+    protected Vector3Int vec3IntTemp = new Vector3Int();
+    public abstract BaseLevelTile CreateTile(Vector3Int pos, LevelTileData data);
+    public virtual void UpdateViewTile(BaseLevelTile tile) {
+        if (tile.viewNeedUpdate == false)
             return;
-        vec3IntTemp.x = tile.pos.x;
-        vec3IntTemp.y = tile.pos.y;
-        vec3IntTemp.z = 0;
+        vec3IntTemp = IndexToTilemap(tile.pos);
         if (tile.IsEmpty() == false) {
             var tileDisplay = tile.data.GetTile();
             if (tilemap.GetTile(vec3IntTemp)!= tileDisplay)
@@ -576,7 +589,7 @@ public abstract class LevelTilemap : MonoBehaviour {
         } else {
             tilemap.SetTile(vec3IntTemp, null);
         }
-        tile.needUpdate = false;
+        tile.viewNeedUpdate = false;
     }
     public virtual void ChangedTile(ITile tile) {
         var x = tile.pos.x;
@@ -584,13 +597,11 @@ public abstract class LevelTilemap : MonoBehaviour {
         var tilemap = GetTileMap(PosToChunk(x, y).x, PosToChunk(x, y).y);
         tilemap.ChangedTile(PosToPosInChunk(x, y).x, PosToPosInChunk(x, y).y);
     }
-    public virtual void DestroyTile(BaseTile tile) {
+    public virtual void DestroyTile(BaseLevelTile tile) {
 
     }
-    public virtual void OverrideTile(BaseTile tile) {
 
-    }
-    public virtual void InitTile(BaseTile tile) {
+    public virtual void InitTile(BaseLevelTile tile) {
 
     }
     #region

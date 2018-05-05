@@ -121,13 +121,13 @@ public class BaseRoom : BaseLevelStructure {
 [CreateAssetMenu(menuName = "TileMap/LevelGenerator/BaseRoom")]
 public class Structure_BaseRoomData : BaseLevelStructureData {
     [HideInInspector]
-    public TileLevelData[] roomTileList;
+    public LevelTileData[] roomTileList;
     public int sizeX;
     public int sizeY;
     public const int doorSize = 3;
-    public TileLevelData wall;
-    public TileLevelData floor;
-    public TileLevelData fillData;
+    public LevelTileData wall;
+    public LevelTileData floor;
+    public LevelTileData fillData;
     public bool generateWalls;
     public void UpdateDoors() {
         //roomTileList = new TileLevelData[FixedRoomGenerator.fixedRoomSizeX * FixedRoomGenerator.fixedRoomSizeY];
@@ -172,19 +172,19 @@ public class Structure_BaseRoomData : BaseLevelStructureData {
         r.Init(this);
         return r;
     }
-    public void Overwrite(TileLevelData[] tiles) {
+    public void Overwrite(LevelTileData[] tiles) {
         if(tiles.Length == sizeX * sizeY) {
             Debug.LogWarning("Wrong size");
             return;
         }
-        roomTileList = new TileLevelData[sizeX * sizeY];
+        roomTileList = new LevelTileData[sizeX * sizeY];
         for (int i = 0; i < tiles.Length; i++) {
             roomTileList[i] = tiles[i];
         }
     }
     [HideInInspector]
     public List<bool> topPossibleDoors;
-    public List<bool> GetTopPossibleDoors(TileLevelData floor) {
+    public List<bool> GetTopPossibleDoors(LevelTileData floor) {
         return topPossibleDoors;
     }
     public List<Vector2Int> GetTopPossibleDoorsPos() {
@@ -209,7 +209,7 @@ public class Structure_BaseRoomData : BaseLevelStructureData {
     }
     [HideInInspector]
     public List<bool> bottomPossibleDoors;
-    public List<bool> GetBottomPossibleDoors(TileLevelData floor) {
+    public List<bool> GetBottomPossibleDoors(LevelTileData floor) {
        
         return bottomPossibleDoors;
     }
@@ -232,7 +232,7 @@ public class Structure_BaseRoomData : BaseLevelStructureData {
     }
     [HideInInspector]
     public List<bool> leftPossibleDoors;
-    public List<bool> GetLeftPossibleDoors(TileLevelData floor) {
+    public List<bool> GetLeftPossibleDoors(LevelTileData floor) {
         var leftPossibleDoors = new List<bool>();
         for (int y = 0; y < sizeY; y++) {
             if (PossibleDoorLeft(y))
@@ -253,7 +253,7 @@ public class Structure_BaseRoomData : BaseLevelStructureData {
     }
     [HideInInspector]
     public List<bool> rightPossibleDoors;
-    public List<bool> GetRightPossibleDoors(TileLevelData floor) {
+    public List<bool> GetRightPossibleDoors(LevelTileData floor) {
         var rightPossibleDoors = new List<bool>();
         for (int y = 0; y < sizeY; y++) {
             if (PossibleDoorRight(y))
@@ -283,7 +283,7 @@ public class Structure_BaseRoomData : BaseLevelStructureData {
         sizeX = saveFile.sizeX;
         sizeY = saveFile.sizeY;
         GenerateUtility utility = new GenerateUtility();
-        roomTileList = new TileLevelData[sizeX * sizeY];
+        roomTileList = new LevelTileData[sizeX * sizeY];
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
                 roomTileList[x + y * sizeX] = utility.GetDataFromName(saveFile.tiles[x + y * sizeX].tileDataName);

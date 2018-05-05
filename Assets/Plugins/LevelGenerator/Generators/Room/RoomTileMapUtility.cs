@@ -3,24 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEditor;
+
 public class RoomTileMapUtility : MonoBehaviour {
+#if UNITY_EDITOR
     public SaveUtility saveUtility;
     public LevelTilemap level;
     public Structure_BaseRoomData room;
-    public TileLevelData defaultData;
-    public TileLevelData roomWall;
-    public TileLevelData roomFloor;
+    public LevelTileData defaultData;
+    public LevelTileData roomWall;
+    public LevelTileData roomFloor;
     public List<Texture2D> textureList;
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     public void LoadRoom() {
         GeneratorMapData mapdata = new GeneratorMapData(room.sizeX,room.sizeY, defaultData);
@@ -41,13 +33,13 @@ public class RoomTileMapUtility : MonoBehaviour {
         CreateRoom(saveFile);
     }
     public void CreateRoom(TileMapSaveData saveFile) {
-#if UNITY_EDITOR
+
         var room = new BaseFixedRoomData();
         room.name = saveUtility.fileName;
         ApplyToRoom(room, saveFile);
         UnityEditor.AssetDatabase.CreateAsset(room, saveUtility.GetAssetPath("asset"));
         //UnityEditor.AssetDatabase.SaveAssets();
-#endif
+
     }
     public void CreateRoomFromTextureList() {
         TileMapEditorUtility utility = new TileMapEditorUtility();
@@ -63,4 +55,5 @@ public class RoomTileMapUtility : MonoBehaviour {
         room.UpdateDoors();
 
     }
+#endif
 }

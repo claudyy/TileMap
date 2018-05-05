@@ -734,8 +734,8 @@ public class FixedRoomGeneratorData : BaseLevelStructureData {
     public int levelSizeY;
     public Vector2Int roomCountRange;
     public Vector2Int additionalCoridorLengthRange;
-    public TileLevelData floor;
-    public TileLevelData wall;
+    public LevelTileData floor;
+    public LevelTileData wall;
 
     public override BaseLevelStructure GetStructure() {
         var s = new FixedRoomGenerator();

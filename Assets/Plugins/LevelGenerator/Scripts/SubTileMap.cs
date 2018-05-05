@@ -8,15 +8,15 @@ using System.Linq;
 public class SubTileMap{
 
     //public Tilemap tilemap;
-    public TileLevelData empty;
+    public LevelTileData empty;
     public int posX;
     public int posY;
     //[SerializeField]
     //[HideInInspector]
-    public BaseTile[] tiles;
-    public TileLevelData[] tilesData;
-    public List<BaseTile> updateTilesInView = new List<BaseTile>();
-    public List<BaseTile> updateTiles = new List<BaseTile>();
+    public BaseLevelTile[] tiles;
+    public LevelTileData[] tilesData;
+    public List<BaseLevelTile> updateTilesInView = new List<BaseLevelTile>();
+    public List<BaseLevelTile> updateTiles = new List<BaseLevelTile>();
 
     //[HideInInspector]
     public int chunkSize;
@@ -24,7 +24,7 @@ public class SubTileMap{
     public void Init(LevelTilemap level)
     {
         isLoaded = false;
-        tiles = new BaseTile[chunkSize * chunkSize * chunkSize];
+        tiles = new BaseLevelTile[chunkSize * chunkSize * chunkSize];
         for (int x = 0; x < chunkSize; x++) {
             for (int y = 0; y < chunkSize; y++) {
                 tiles[x + y * chunkSize] = level.CreateTile(ToTilePosition(x, y), GetData(x, y));// new LevelTile(ToTilePosition(x, y), GetData(x,y),level);
@@ -50,17 +50,15 @@ public class SubTileMap{
         {
             for (int x = 0; x < chunkSize; x++)
             {
-                level.UpdateTile(GetTile(x, y));
+                level.UpdateViewTile(GetTile(x, y));
             }
             yield return null;
         }
 
     }
-    public void UpdateTile(int x,int y, LevelTilemap level) {
-        
-    }
+
     
-    public TileLevelData GetDataFromList(string name,TileLevelData[] list) {
+    public LevelTileData GetDataFromList(string name,LevelTileData[] list) {
         if (name == "")
             return null;
         for (int i = 0; i < list.Length; i++) {
@@ -96,19 +94,9 @@ public class SubTileMap{
         RemoveTile(level,pos.x, pos.y);
         GetTile(pos.x, pos.y).OverrideData(level,null,pos);
         level.DestroyTile(GetTile(pos.x, pos.y));
-        UpdateTile(pos.x, pos.y, level);
+        //UpdateTile(pos.x, pos.y, level);
     }
-    public void OverrideTile(int x, int y, LevelTilemap level, TileLevelData data) {
-        RemoveTile(level,x, y);
-        var tile = GetTile(x, y);
-        tile.OverrideData(level,data,x,y);
-        if (tile.HaveBehaviorUpdate())
-            updateTiles.Add(tile);
-        if (tile.HaveBehaviorViewUpdate())
-            updateTilesInView.Add(tile);
-        level.OverrideTile(tile);
-        UpdateTile(x, y, level);
-    }
+    
     void RemoveTile(LevelTilemap level, int x, int y) {
         var tile = GetTile(x, y);
         tile.Remove(level);
@@ -117,7 +105,7 @@ public class SubTileMap{
         if (tile.HaveBehaviorViewUpdate())
             updateTilesInView.Remove(tile);
     }
-    public BaseTile GetTile(int x, int y)
+    public BaseLevelTile GetTile(int x, int y)
     {
         return tiles[y * chunkSize + x];
     }
@@ -126,10 +114,10 @@ public class SubTileMap{
         this.posX = posX;
         this.posY = posY;
         this.chunkSize = chunkSize;
-        tilesData = new TileLevelData[chunkSize * chunkSize];
+        tilesData = new LevelTileData[chunkSize * chunkSize];
     }
     public void UpdateFromData(LevelTilemap level) {
-        TileLevelData data = null;
+        LevelTileData data = null;
         for (int x = 0; x < chunkSize; x++) {
             for (int y = 0; y < chunkSize; y++) {
                 data = tilesData[y * chunkSize + x];
@@ -139,10 +127,10 @@ public class SubTileMap{
             }
         }
     }
-    public void OverrideDataNameTile(int x, int y, TileLevelData data) {
+    public void OverrideDataNameTile(int x, int y, LevelTileData data) {
         tilesData[y * chunkSize + x] = data;
     }
-    public TileLevelData GetData(int x, int y) {
+    public LevelTileData GetData(int x, int y) {
         return tilesData[x + y * chunkSize];
     }
 

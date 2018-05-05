@@ -22,8 +22,8 @@ public class FixedRoomGeneratorOld : BaseLevelGenerator {
     public Vector2Int additionalCoridorLengthRange;
     public BaseFixedRoom[] rooms;
     public List<BaseFixedRoom> freeRooms;
-    public TileLevelData floor;
-    public TileLevelData wall;
+    public LevelTileData floor;
+    public LevelTileData wall;
     Vector2Int center{
         get {
             return new Vector2Int(levelSizeX / 2, levelSizeY / 2);

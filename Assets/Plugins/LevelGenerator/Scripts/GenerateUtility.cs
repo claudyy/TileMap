@@ -4,9 +4,9 @@ using UnityEngine;
 using ClaudeFehlen.Tileset;
 using System.Linq;
 public class GenerateUtility {
-    TileLevelData[] allData;
+    LevelTileData[] allData;
     public GenerateUtility() {
-        allData = Resources.LoadAll("", typeof(TileLevelData)).Cast<TileLevelData>().ToArray();
+        allData = Resources.LoadAll("", typeof(LevelTileData)).Cast<LevelTileData>().ToArray();
 
     }
     public float ReadTexture(Texture2D tex, float x, float y)
@@ -17,7 +17,7 @@ public class GenerateUtility {
         posY %= tex.height;
         return tex.GetPixel(posX, posY).r;
     }
-    public TileLevelData GetDataFromName(string name) {
+    public LevelTileData GetDataFromName(string name) {
         if (name == "")
             return null;
         for (int i = 0; i < allData.Length; i++) {

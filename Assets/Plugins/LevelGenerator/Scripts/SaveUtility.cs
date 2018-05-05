@@ -15,7 +15,10 @@ public class SaveUtility {
         return Application.dataPath + "/" + path + fileName + "."+ fileType;
     }
     public string GetAssetPath(string fileType) {
+#if UNITY_EDITOR
         var path = this.path + fileName + "." + fileType;
         return UnityEditor.AssetDatabase.GenerateUniqueAssetPath(path);
+#endif
+        return "";
     }
 }

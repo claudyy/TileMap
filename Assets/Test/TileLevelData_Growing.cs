@@ -41,7 +41,7 @@ public class TileBehavior_Growing : BaseTileBehvior
     */
 }
 [CreateAssetMenu(menuName = "Data/LevelGeneration/TileData_Growing")]
-public class TileLevelData_Growing : TileLevelData
+public class TileLevelData_Growing : LevelTileData
 {
     /*
     public TileLevelData growingTile;

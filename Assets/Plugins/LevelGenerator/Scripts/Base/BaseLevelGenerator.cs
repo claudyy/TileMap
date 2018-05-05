@@ -9,23 +9,23 @@ using System.Diagnostics;
 using System;
 
 public class GeneratorMapData {
-    public TileLevelData[] tiles;
+    public LevelTileData[] tiles;
     public int sizeX;
     public int sizeY;
-    public GeneratorMapData(int sizeX, int sizeY,TileLevelData defaultTile) {
+    public GeneratorMapData(int sizeX, int sizeY,LevelTileData defaultTile) {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
-        tiles = new TileLevelData[sizeX*sizeY];
+        tiles = new LevelTileData[sizeX*sizeY];
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
                 tiles[x + y * sizeX] = defaultTile;
             }
         }
     }
-    public void OverrideTile(int x,int y,TileLevelData data) {
+    public void OverrideTile(int x,int y,LevelTileData data) {
         tiles[x + y *sizeX] = data;
     }
-    public TileLevelData GetTile(int x, int y) {
+    public LevelTileData GetTile(int x, int y) {
         return tiles[x + y * sizeX];
     }
     public TileMapSaveData GetNewSaveFile() {
@@ -79,7 +79,7 @@ public class GeneratorMapData {
 [ExecuteInEditMode()]
 public class BaseLevelGenerator : MonoBehaviour {
     public SaveUtility saveUtiliy;
-    public TileLevelData defaultTileData;
+    public LevelTileData defaultTileData;
     public LevelTilemap level;
     public StringBuilder result;
     public int border;
@@ -190,7 +190,9 @@ public class BaseLevelGenerator : MonoBehaviour {
 
         result.AppendLine("All Generation Duration: "+ GenerationStopwatch.Elapsed.Seconds + " : " + GenerationStopwatch.Elapsed.Milliseconds);
         result.AppendLine("Tries: "+ tries);
+#if UNITY_EDITOR
         UnityEngine.Debug.Log(result.ToString());
+#endif
         yield return null;
         level.dontUpdate = false;
 
@@ -296,7 +298,7 @@ public class BaseLevelGenerator : MonoBehaviour {
     public void FillWithDefault(LevelTilemap level) {
         FillWithTile(level, defaultTileData);
     }
-    public void FillWithTile(LevelTilemap level,TileLevelData data) {
+    public void FillWithTile(LevelTilemap level,LevelTileData data) {
         for (int x = 0; x < level.sizeX; x++)
         {
             for (int y = 0; y < level.sizeY; y++)
@@ -305,7 +307,7 @@ public class BaseLevelGenerator : MonoBehaviour {
             }
         }
     }
-    public void FillWithDataName(LevelTilemap level, TileLevelData data) {
+    public void FillWithDataName(LevelTilemap level, LevelTileData data) {
         for (int x = 0; x < level.sizeX; x++) {
             for (int y = 0; y < level.sizeY; y++) {
                 level.OverrideDataNameTile(x,y,data);

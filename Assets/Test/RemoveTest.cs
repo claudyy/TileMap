@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RemoveTest : MonoBehaviour {
     public LevelTilemap level;
-    public TileLevelData data;
+    public LevelTileData data;
     // Use this for initialization
     void Start () {
 		

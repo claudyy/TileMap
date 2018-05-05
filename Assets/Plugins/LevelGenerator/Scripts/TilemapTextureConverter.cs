@@ -16,7 +16,7 @@ public class TilemapTextureConverter : MonoBehaviour {
         target.CreateSaveFile(CreateSaveData(), saveUtility);
     }
     TileMapSaveData CreateSaveData() {
-        var allData = Resources.LoadAll("", typeof(TileLevelData)).Cast<TileLevelData>().ToArray();
+        var allData = Resources.LoadAll("", typeof(LevelTileData)).Cast<LevelTileData>().ToArray();
         TileMapSaveData st = new TileMapSaveData();
         st.sizeX = loadTexture.width;
         st.sizeY = loadTexture.height;
@@ -30,8 +30,8 @@ public class TilemapTextureConverter : MonoBehaviour {
         st.tiles = datas;
         return st;
     }
-    TileSaveData GetDataFromColor(Color c,TileLevelData[] allData) {
-        TileLevelData data = null;
+    TileSaveData GetDataFromColor(Color c,LevelTileData[] allData) {
+        LevelTileData data = null;
         for (int i = 0; i < allData.Length; i++) {
             if(allData[i].editorColor == c) {
                 data = allData[i];

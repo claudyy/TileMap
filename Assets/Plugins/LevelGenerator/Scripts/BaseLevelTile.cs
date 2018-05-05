@@ -2,22 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseTile {
+public abstract class BaseLevelTile {
 
     public int health;
 
-    public TileLevelData data;
+    public LevelTileData data;
     public BaseTileBehvior behavior;
     public Vector3Int pos;
     public int x;
     public int y;
 
-    public bool needUpdate;
+    public bool viewNeedUpdate;
     BaseTileMapGameobject go;
-    public void Init(LevelTilemap level, TileLevelData data, int x, int y) {
+    public void Init(LevelTilemap level, LevelTileData data, int x, int y) {
         Init(level, data, new Vector3Int(x, y, 0));
     }
-    public virtual void Init(LevelTilemap level, TileLevelData data, Vector3Int pos) {
+    public virtual void Init(LevelTilemap level, LevelTileData data, Vector3Int pos) {
         this.data = data;
         this.pos = pos;
         x = pos.x;
@@ -29,7 +29,7 @@ public abstract class BaseTile {
             data.Init(level, this);
             behavior.Init(level, this);
         }
-        needUpdate = true;
+        viewNeedUpdate = true;
     }
     public virtual void UpdateBehaviorTile(LevelTilemap level) {
         if (behavior != null)
@@ -45,10 +45,10 @@ public abstract class BaseTile {
             return true;
         return data.tile == null;
     }
-    public void OverrideData(LevelTilemap level, TileLevelData data, int x,int y) {
+    public void OverrideData(LevelTilemap level, LevelTileData data, int x,int y) {
         Init(level, data, x,y);
     }
-    public void OverrideData(LevelTilemap level, TileLevelData data, Vector3Int pos) {
+    public void OverrideData(LevelTilemap level, LevelTileData data, Vector3Int pos) {
         Init(level,data,pos);
     }
 

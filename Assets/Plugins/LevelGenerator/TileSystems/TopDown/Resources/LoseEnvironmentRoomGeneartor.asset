@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89e74593186872543955bf4659f722b3, type: 3}
+  m_Name: LoseEnvironmentRoomGeneartor
+  m_EditorClassIdentifier: 
+  roomCount: 12
+  needRoomCount: 12
+  averageRoomSize: {x: 8, y: 5}
+  roomsData:
+  - {fileID: 11400000, guid: 3c608adf0e654d84fbdcb8bb78e7f638, type: 2}
+  - {fileID: 11400000, guid: 4945a38bf8b28a94382154cb87f755f4, type: 2}
+  - {fileID: 11400000, guid: ad6a7551474f75f4d96b9ac49df0035b, type: 2}
+  - {fileID: 11400000, guid: ad6a7551474f75f4d96b9ac49df0035b, type: 2}
+  - {fileID: 11400000, guid: 655a2c583cccaef46886d9e4fef3538c, type: 2}
+  floor: {fileID: 11400000, guid: 1bc59054fed153f43a90ac7d508f1e09, type: 2}
+  ignoreTileList:
+  - {fileID: 11400000, guid: d0c5ea93151442d4ab4fa002002dd94e, type: 2}

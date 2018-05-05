@@ -79,7 +79,7 @@ public class NoiseMixer{
 [System.Serializable]
 public class BiomWallData{
 	
-    public TileLevelData data;
+    public LevelTileData data;
     public float blendFactore = .5f;
 	public bool randomOffset;
 	public NoiseMixer noiseMixer;
@@ -102,8 +102,8 @@ public class BiomWallData{
        //}
         
     }
-    public TileLevelData GetTile(int x , int y,int sizeX,int sizeY, List<float> randomValue) {
-        TileLevelData tile = null;
+    public LevelTileData GetTile(int x , int y,int sizeX,int sizeY, List<float> randomValue) {
+        LevelTileData tile = null;
         Vector2 offset = Vector2.zero;
 
         if (randomOffset)
@@ -116,7 +116,7 @@ public class BiomWallData{
 [System.Serializable]
 public class BiomPlantInfo{
 	public int minDistance;
-	public TileLevelData tile;
+	public LevelTileData tile;
 	public bool placeOnWall;
 }
 public class BiomStructure : BaseLevelStructure {
@@ -261,7 +261,7 @@ public class BiomData : BaseLevelStructureData {
 	public Vector2Int size;
     public int sizeX;
     public int sizeY;
-    public TileLevelData baseTile;
+    public LevelTileData baseTile;
     public NoiseMixer border;
 	public float borderBlend = 0.5f;
     public List<BiomWallData> wallData;
@@ -269,7 +269,7 @@ public class BiomData : BaseLevelStructureData {
 	public List<BiomPlantInfo> plants;
     [System.Serializable]
     public struct OreInfo {
-        public TileLevelData data;
+        public LevelTileData data;
         public Vector2Int depositSize;
         public Vector2Int depositCount;
         public int minDistanceBetweenDeposit;

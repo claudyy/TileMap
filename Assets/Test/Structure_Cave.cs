@@ -18,7 +18,7 @@ public class StructureTunnel
         length = (int)(end - start).magnitude;
         dir.Normalize();
     }
-	public void GenerateTunnel(Rect rect,LevelTilemap level, BaseLevelStructureData data, Texture2D noise, Texture2D tunnelTex, TileLevelData tileData,bool[,] canOverwrite)
+	public void GenerateTunnel(Rect rect,LevelTilemap level, BaseLevelStructureData data, Texture2D noise, Texture2D tunnelTex, LevelTileData tileData,bool[,] canOverwrite)
     {
         for (float x = 0; x < length; x += .5f)
         {
@@ -44,7 +44,7 @@ public class StructureTunnel
             }
         }
     }
-	public bool TryIfCanGenerateTunnel(Rect rect , LevelTilemap level, BaseLevelStructureData data, Texture2D noise, Texture2D tunnelTex, TileLevelData tileData,bool[,] canOverwrite)
+	public bool TryIfCanGenerateTunnel(Rect rect , LevelTilemap level, BaseLevelStructureData data, Texture2D noise, Texture2D tunnelTex, LevelTileData tileData,bool[,] canOverwrite)
 	{
 		for (float x = 0; x < length; x += .5f)
 		{
@@ -88,7 +88,7 @@ public class StructureCave{
         this.sizeY = sizeY;
         this.pos = pos;
     }
-	public void Generate(Rect rect,LevelTilemap level, BaseLevelStructureData data, Texture2D noise, Texture2D caveTex, TileLevelData tileData,bool[,] canOverwrite)
+	public void Generate(Rect rect,LevelTilemap level, BaseLevelStructureData data, Texture2D noise, Texture2D caveTex, LevelTileData tileData,bool[,] canOverwrite)
     {
         for (int x = 0; x < sizeX; x++)
         {
@@ -108,7 +108,7 @@ public class StructureCave{
             }
         }
     }
-	public bool CheckIfCanGenerate(Rect rect, LevelTilemap level, BaseLevelStructureData data, Texture2D noise, Texture2D caveTex, TileLevelData tileData,bool[,] canOverwrite)
+	public bool CheckIfCanGenerate(Rect rect, LevelTilemap level, BaseLevelStructureData data, Texture2D noise, Texture2D caveTex, LevelTileData tileData,bool[,] canOverwrite)
 	{
 		for (int x = 0; x < sizeX; x++)
 		{

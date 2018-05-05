@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 public class Tilemap_Isometric : LevelTilemap {
-    public override BaseTile CreateTile(Vector3Int pos, TileLevelData data) {
+    public override BaseLevelTile CreateTile(Vector3Int pos, LevelTileData data) {
         return new LevelTile_Isometric();
     }
 
