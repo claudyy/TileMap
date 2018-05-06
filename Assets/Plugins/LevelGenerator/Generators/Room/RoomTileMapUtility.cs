@@ -20,7 +20,7 @@ public class RoomTileMapUtility : MonoBehaviour {
         structure.posX = 0;
         structure.posY = 0;
         structure.Generate(mapdata);
-        level.ApplySaveFileToMap(mapdata.GetNewSaveFile());
+        level.EditorApplySaveFileToTilmap(mapdata.GetNewSaveFile());
     }
 
     public void ApplyToRoom() {

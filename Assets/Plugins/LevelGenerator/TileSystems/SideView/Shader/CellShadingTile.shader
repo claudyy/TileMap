@@ -1,6 +1,6 @@
 ﻿// Upgrade NOTE: upgraded instancing buffer 'Props' to new syntax.
 
-Shader "Custom/CellShadingTileCut" {
+Shader "Sprite/Tilemap/CellShadingOld" {
 	Properties {
 		_Color ("Color", Color) = (1,1,1,1)
 		[PerRendererData] _MainTex ("Albedo (RGB)", 2D) = "white" {}

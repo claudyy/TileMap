@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -16,7 +16,6 @@ namespace UnityEngine.Tilemaps
 	{
 		[SerializeField]
 		public Sprite[] m_Sprites;
-
 		public override void RefreshTile(Vector3Int location, ITilemap tileMap)
 		{
 			for (int yd = -1; yd <= 1; yd++)
@@ -197,8 +196,8 @@ namespace UnityEngine.Tilemaps
 			}
 		}
 
-
-		public override void OnInspectorGUI()
+        Texture2D importImage;
+        public override void OnInspectorGUI()
 		{
 			EditorGUILayout.LabelField("Place sprites shown based on the contents of the sprite.");
 			EditorGUILayout.Space();
@@ -206,7 +205,7 @@ namespace UnityEngine.Tilemaps
 			float oldLabelWidth = EditorGUIUtility.labelWidth;
 			EditorGUIUtility.labelWidth = 210;
 
-			EditorGUI.BeginChangeCheck();
+            EditorGUI.BeginChangeCheck();
 			tile.m_Sprites[0] = (Sprite) EditorGUILayout.ObjectField("Filled", tile.m_Sprites[0], typeof(Sprite), false, null);
 			tile.m_Sprites[1] = (Sprite) EditorGUILayout.ObjectField("Three Sides", tile.m_Sprites[1], typeof(Sprite), false, null);
 			tile.m_Sprites[2] = (Sprite) EditorGUILayout.ObjectField("Two Sides and One Corner", tile.m_Sprites[2], typeof(Sprite), false, null);
@@ -222,11 +221,28 @@ namespace UnityEngine.Tilemaps
 			tile.m_Sprites[12] = (Sprite) EditorGUILayout.ObjectField("Two Opposite Corners", tile.m_Sprites[12], typeof(Sprite), false, null);
 			tile.m_Sprites[13] = (Sprite) EditorGUILayout.ObjectField("One Corner", tile.m_Sprites[13], typeof(Sprite), false, null);
 			tile.m_Sprites[14] = (Sprite) EditorGUILayout.ObjectField("Empty", tile.m_Sprites[14], typeof(Sprite), false, null);
-			if (EditorGUI.EndChangeCheck())
-				EditorUtility.SetDirty(tile);
+			
+            importImage = (Texture2D)EditorGUILayout.ObjectField("Image", importImage, typeof(Texture2D), false);
 
-			EditorGUIUtility.labelWidth = oldLabelWidth;
+            if (EditorGUI.EndChangeCheck())
+                EditorUtility.SetDirty(tile);
+
+            if (GUILayout.Button("Import"))
+                ImportTexture();
+
+            EditorGUIUtility.labelWidth = oldLabelWidth;
 		}
+        void ImportTexture() {
+            string spriteSheet = AssetDatabase.GetAssetPath(importImage);
+            Sprite[] sprites = AssetDatabase.LoadAllAssetsAtPath(spriteSheet).OfType<Sprite>().ToArray();
+            for (int i = 0; i < tile.m_Sprites.Length; i++) {
+                tile.m_Sprites[i] = sprites[i];
+            }
+            importImage = null;
+            AssetDatabase.Refresh();
+            EditorUtility.SetDirty(tile);
+            AssetDatabase.SaveAssets();
+        }
 	}
 #endif
 }

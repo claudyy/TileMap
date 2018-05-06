@@ -1,7 +1,7 @@
 ﻿
 // Upgrade NOTE: upgraded instancing buffer 'Props' to new syntax.
 
-Shader "Custom/MetalicMappedTile" {
+Shader "Sprite/Tilemap/Metalic" {
 	Properties {
 		_Color ("Color", Color) = (1,1,1,1)
 		[PerRendererData] _MainTex ("Albedo (RGB)", 2D) = "white" {}

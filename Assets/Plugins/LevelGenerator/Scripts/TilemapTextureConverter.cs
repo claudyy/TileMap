@@ -9,7 +9,7 @@ public class TilemapTextureConverter : MonoBehaviour {
     public Texture2D loadTexture;
     public LevelTilemap target;
 	public void LoadTexture() {
-        target.ApplySaveFileToMap(CreateSaveData());
+        target.EditorApplySaveFileToTilmap(CreateSaveData());
     }
     public void CreateSaveFile() {
 

@@ -251,7 +251,7 @@ public class BaseLevelGenerator : MonoBehaviour {
 
 
         DebugCheckTimeStart("UpdateViews");
-        level.ApplySaveFileToMap(map.GetNewSaveFile());
+        level.EditorApplySaveFileToTilmap(map.GetNewSaveFile());
         if (CreateSaveFile)
             level.CreateSaveFile(map.GetNewSaveFile(), saveUtiliy);
         _progress++;

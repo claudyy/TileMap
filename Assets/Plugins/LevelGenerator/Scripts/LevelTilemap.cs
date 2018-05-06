@@ -104,7 +104,7 @@ public abstract class LevelTilemap : MonoBehaviour {
         }
         return size;
     }
-    public LevelTileData LoadDataFromTileMap(Vector3Int pos, LevelTileData[] allData) {
+    public virtual LevelTileData LoadDataFromTileMap(Vector3Int pos, LevelTileData[] allData) {
        var tile = tilemap.GetTile(pos);
         for (int i = 0; i < allData.Length; i++) {
             if (tile == allData[i].tile)
@@ -132,6 +132,21 @@ public abstract class LevelTilemap : MonoBehaviour {
     }
     public virtual void ClearTilemap() {
         tilemap.ClearAllTiles();
+    }
+    public void EditorApplySaveFileToTilmap(TileMapSaveData st) {
+        ClearTilemap();
+        var allData = Resources.LoadAll("", typeof(LevelTileData)).Cast<LevelTileData>().ToArray();
+        LevelTileData tile = null;
+        Vector3Int pos = new Vector3Int(0, 0, 0);
+        for (int x = 0; x < st.sizeX; x++) {
+            for (int y = 0; y < st.sizeY; y++) {
+                tile = GetDataFromList(st.tiles[x + y * st.sizeX].tileDataName, allData);
+                EditorApplySaveFileToTile(x, y, tile);
+            }
+        }
+    }
+    public virtual void EditorApplySaveFileToTile(int x, int y, LevelTileData data) {
+        SetTile(IndexToTilemap(x, y), data.GetTile());
     }
     #endregion
 
@@ -310,21 +325,7 @@ public abstract class LevelTilemap : MonoBehaviour {
         }
         return tiles;
     }
-    public void ApplySaveFileToMap(TileMapSaveData st) {
-        ClearTilemap();
-        var allData = Resources.LoadAll("", typeof(LevelTileData)).Cast<LevelTileData>().ToArray();
-        LevelTileData tile = null;
-        Vector3Int pos = new Vector3Int(0,0,0);
-        for (int x = 0; x < st.sizeX; x++) {
-            for (int y = 0; y < st.sizeY; y++) {
-                tile = GetDataFromList(st.tiles[x + y * st.sizeX].tileDataName, allData);
-                pos.x = x;
-                pos.y = y;
-                if (tile != null)
-                    SetTile(pos, tile.GetTile());
-            }
-        }
-    }
+ 
     public void Save() {
         var st =  new TileMapSaveData();
         st.sizeX = sizeX;
@@ -371,6 +372,12 @@ public abstract class LevelTilemap : MonoBehaviour {
     }
     public virtual Vector3Int IndexToTilemap(Vector3Int index) {
         return index;
+    }
+    public virtual Vector3Int IndexToTilemap(int x, int y) {
+        vec3IntTemp.x = x;
+        vec3IntTemp.y = y;
+        vec3IntTemp.z = 0;
+        return IndexToTilemap(vec3IntTemp);
     }
     public virtual Vector3Int WorldPosToIndex(Vector3 worldPos) {
         return new Vector3Int((int)worldPos.x,(int)worldPos.y,0);

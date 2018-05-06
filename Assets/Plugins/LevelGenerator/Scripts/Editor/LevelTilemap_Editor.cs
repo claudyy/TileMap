@@ -13,7 +13,7 @@ public class LevelTilemap_Editor : Editor {
             tilemap.Load();
         if (GUILayout.Button("Save"))
             tilemap.Save();
-        if (GUILayout.Button("Clear Prefab"))
-            tilemap.grid.GetComponentInChildren<Tilemap>().ClearAllTiles();
+        if (GUILayout.Button("Clear Tilemap"))
+            tilemap.ClearTilemap();
     }
 }
