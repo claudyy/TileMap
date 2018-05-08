@@ -68,4 +68,10 @@ public class LevelTileData : ScriptableObject{
     public virtual void Init(LevelTilemap map,BaseLevelTile tile) {
 
     }
+    public virtual void Remove(LevelTilemap map, BaseLevelTile tile) {
+
+    }
+    public virtual string DebugInfo() {
+        return name.ToString();
+    }
 }

@@ -8,19 +8,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf63dcccdaf76114b9de1aaf03d0844d, type: 3}
-  m_Name: Stone
+  m_Script: {fileID: 11500000, guid: f901fe7884e11bf4cac6f44a964115ad, type: 3}
+  m_Name: Building
   m_EditorClassIdentifier: 
-  tile: {fileID: 11400000, guid: d1f12a7f6fd0d8d46bacb78b0ab370c2, type: 2}
+  tile: {fileID: 11400000, guid: 07fb0fcf21c19ac478dcf3b9964d5e69, type: 2}
   editorColor: {r: 0, g: 0.3372549, b: 0.5647059, a: 1}
   maxHealth: 12
-  backgroundTile: {fileID: 11400000, guid: ea1c91d3fb508b440a3e4c7d007ec263, type: 2}
-  isTransparent: 0
+  backgroundTile: {fileID: 0}
+  isTransparent: 1
   lihgtAbsorption: 1
   baseLight: 0
   damageFX:
-    damageTiles: []
+    damageTiles:
+    - {fileID: 11400000, guid: 581dbacc9791c7e4a95a753282628aaf, type: 2}
   baseHeat: 0
   emitHeat: 0
   emitHeatRange: 0
-  heatAbsorption: 1
+  heatAbsorption: 0
+  size: {x: 1, y: 1}

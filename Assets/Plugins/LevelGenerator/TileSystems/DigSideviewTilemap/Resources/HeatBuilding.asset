@@ -9,18 +9,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf63dcccdaf76114b9de1aaf03d0844d, type: 3}
-  m_Name: Stone
+  m_Name: HeatBuilding
   m_EditorClassIdentifier: 
-  tile: {fileID: 11400000, guid: d1f12a7f6fd0d8d46bacb78b0ab370c2, type: 2}
+  tile: {fileID: 11400000, guid: ea1c91d3fb508b440a3e4c7d007ec263, type: 2}
   editorColor: {r: 0, g: 0.3372549, b: 0.5647059, a: 1}
-  maxHealth: 12
-  backgroundTile: {fileID: 11400000, guid: ea1c91d3fb508b440a3e4c7d007ec263, type: 2}
-  isTransparent: 0
-  lihgtAbsorption: 1
-  baseLight: 0
+  maxHealth: 1
+  backgroundTile: {fileID: 0}
   damageFX:
-    damageTiles: []
+    damageTiles:
+    - {fileID: 11400000, guid: 581dbacc9791c7e4a95a753282628aaf, type: 2}
   baseHeat: 0
-  emitHeat: 0
+  emitHeat: 10
   emitHeatRange: 0
-  heatAbsorption: 1
+  heatAbsorption: 0
+  baseLight: 0
+  emitLight: 10
+  emitLightRange: 4
+  lightAbsorption: 0

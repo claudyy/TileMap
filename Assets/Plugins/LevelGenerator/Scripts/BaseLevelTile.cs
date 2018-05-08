@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 public abstract class BaseLevelTile {
 
-    public int health;
 
     public LevelTileData data;
     public BaseTileBehvior behavior;
@@ -14,6 +13,9 @@ public abstract class BaseLevelTile {
 
     public bool viewNeedUpdate;
     BaseTileMapGameobject go;
+    public BaseLevelTile linkedTile;
+    public Action<LevelTilemap,BaseLevelTile> onRemove;
+    public Action<LevelTilemap,BaseLevelTile> onInit;
     public void Init(LevelTilemap level, LevelTileData data, int x, int y) {
         Init(level, data, new Vector3Int(x, y, 0));
     }
@@ -30,6 +32,8 @@ public abstract class BaseLevelTile {
             behavior.Init(level, this);
         }
         viewNeedUpdate = true;
+        if (onInit != null)
+            onInit(level, this);
     }
     public virtual void UpdateBehaviorTile(LevelTilemap level) {
         if (behavior != null)
@@ -75,7 +79,6 @@ public abstract class BaseLevelTile {
     public virtual void Destroy(LevelTilemap level) {
         if (HaveBehavior())
             behavior.OnDestry(this, level);
-        Remove(level);
         if (go != null)
             GameObject.Destroy(go.gameObject);
 
@@ -83,6 +86,10 @@ public abstract class BaseLevelTile {
     public virtual void Remove(LevelTilemap level) {
         if (HaveBehavior())
             behavior.OnRemove(this, level);
+        if (data != null)
+            data.Remove(level, this);
+        if (onRemove != null)
+            onRemove(level,this);
     }
     public virtual Color GetColor(LevelTilemap level) {
         if (HaveBehavior() == false)
@@ -92,4 +99,13 @@ public abstract class BaseLevelTile {
     public virtual void AddGo(BaseTileMapGameobject go) {
         this.go = go;
     }
+    public virtual string DebugInfo() {
+        return "";
+    }
+    public string DebugDataInfo() {
+        if (data == null)
+            return "";
+        return data.DebugInfo();
+    }
+   
 }

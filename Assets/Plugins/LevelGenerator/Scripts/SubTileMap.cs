@@ -93,7 +93,6 @@ public class SubTileMap{
     {
         RemoveTile(level,pos.x, pos.y);
         GetTile(pos.x, pos.y).OverrideData(level,null,pos);
-        level.DestroyTile(GetTile(pos.x, pos.y));
         //UpdateTile(pos.x, pos.y, level);
     }
     

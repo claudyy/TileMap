@@ -309,10 +309,10 @@ public abstract class LevelTilemap : MonoBehaviour {
 #if UNITY_EDITOR
         UnityEngine.Debug.Log(str.ToString());
 #endif
-        if(Application.isEditor == false) {
+        //if(Application.isEditor == false) {
             updateVisibleCoroutine = StartCoroutine(UpdateVisible());
             updateAllCoroutine = StartCoroutine(UpdateAllTiles());
-        }
+        //}
 
     }
     public LevelTileData[] GetTileLevelDataFromSaveFile(TileMapSaveData st) {
@@ -435,23 +435,26 @@ public abstract class LevelTilemap : MonoBehaviour {
     public void UpdateViews(int x, int y) {
         GetTileMap(PosToChunk(x,y).x, PosToChunk(x, y).y).UpdateViewChunke(this);
     }
-    public T GetTile<T>(Vector2Int pos) where T: BaseLevelTile {
-        return GetTile<T>(pos.x,pos.y);
+    public T GetTile<T>(Vector2Int pos, bool ignoreLinkedTile = true) where T: BaseLevelTile {
+        return GetTile<T>(pos.x,pos.y, ignoreLinkedTile);
     }
-    public BaseLevelTile GetITile(Vector2Int pos) {
-        return GetTile<BaseLevelTile>(pos.x, pos.y);
+    public BaseLevelTile GetITile(Vector2Int pos, bool ignoreLinkedTile = true) {
+        return GetTile<BaseLevelTile>(pos.x, pos.y, ignoreLinkedTile);
     }
-    public BaseLevelTile GetITile(int x, int y) {
-        return GetTile<BaseLevelTile>(x, y);
+    public BaseLevelTile GetITile(int x, int y,bool ignoreLinkedTile = true) {
+
+        return GetTile<BaseLevelTile>(x, y, ignoreLinkedTile);
     }
-    public T GetTile<T>(int x, int y) where T: BaseLevelTile {
-        //if (x >= sizeX || y >= sizeY || x < 0 || y < 0)
-        //    return LevelTile.Empty;
+    public T GetTile<T>(int x, int y, bool ignoreLinkedTile = true) where T: BaseLevelTile {
+        if (x >= sizeX || y >= sizeY || x < 0 || y < 0)
+            return null;
+
         int posX = x % chunkSize;
         int posY = y % chunkSize;
         int chunkPosX = x / chunkSize;
         int chunkPosY = y / chunkSize;
-
+        if (ignoreLinkedTile == false && GetTileMap(chunkPosX, chunkPosY).GetTile(posX, posY).linkedTile != null)
+            return (T)GetTileMap(chunkPosX, chunkPosY).GetTile(posX, posY).linkedTile;
         return (T)GetTileMap(chunkPosX, chunkPosY).GetTile(posX, posY);
     }
     //[Button]
@@ -504,11 +507,11 @@ public abstract class LevelTilemap : MonoBehaviour {
     }
     public void Erase(int x, int y) {
         var tilemap = GetTileMap(PosToChunk(x,y).x, PosToChunk(x,y).y);
-        tilemap.Erase(PosToPosInChunk(x,y),this  );
+        tilemap.Erase(PosToPosInChunk(x,y),this);
+        SetTile(IndexToTilemap(x, y), null);
     }
     public void Erase(Vector2Int pos) {
-        var tilemap = GetTileMap(PosToChunk(pos).x, PosToChunk(pos).y);
-        tilemap.Erase(PosToPosInChunk(pos),this );
+        Erase(pos.x, pos.y);
     }
     public virtual void OverrideTile(int x, int y, LevelTileData data)
     {
@@ -526,18 +529,22 @@ public abstract class LevelTilemap : MonoBehaviour {
             tilemap.updateTilesInView.Add(tile);
         //OverrideTile(tile);
         //UpdateTile(x, y, this);
-
+        tile.viewNeedUpdate = true;
+        UpdateViewTile(tile);
     }
 
     public void OverrideTile(Vector2Int pos,LevelTileData data)
     {
         OverrideTile(pos.x, pos.y, data);
     }
+    public void OverrideTile(Vector3Int pos, LevelTileData data) {
+        OverrideTile(pos.x, pos.y, data);
+    }
     public void OverrideDataNameTile(int x, int y, LevelTileData data) {
         var tilemap = GetTileMap(PosToChunk(x,y).x, PosToChunk(x,y).y);
         tilemap.OverrideDataNameTile(PosToPosInChunk(x, y).x, PosToPosInChunk(x, y).y, data);
     }
-    void RemoveTile(int x, int y) {
+    public virtual void RemoveTile(int x, int y) {
         var tilemap = GetTileMap(PosToChunk(x, y).x, PosToChunk(x, y).y);
 
         var tile = GetITile(x, y);
@@ -548,6 +555,8 @@ public abstract class LevelTilemap : MonoBehaviour {
             tilemap.updateTilesInView.Remove(tile);
     }
     public bool IsEmpty(int x, int y){
+        if (IsPosOutOfBound(x, y))
+            return true;
         if (GetITile(x, y).data == null)
             return true;
 		return GetITile(x, y).data.tile == null;
@@ -605,13 +614,56 @@ public abstract class LevelTilemap : MonoBehaviour {
         tilemap.ChangedTile(PosToPosInChunk(x, y).x, PosToPosInChunk(x, y).y);
     }
     public virtual void DestroyTile(BaseLevelTile tile) {
-
+        Erase(tile.x,tile.y);
+        tile.Destroy(this);
     }
 
     public virtual void InitTile(BaseLevelTile tile) {
 
     }
+    public bool CanSetLinkedTile(Vector2Int size, BaseLevelTile tile) {
+        int startX = tile.x;
+        int startY = tile.y;
+        for (int x = 0; x < size.x; x++) {
+            for (int y = 0; y < size.y; y++) {
+                if (IsEmpty(startX + x, startY + y) == false || GetITile(startX + x, startY + y).linkedTile != null)
+                    return false;
+            }
+        }
+        return true;
+    }
+    public void SetLinks(Vector2Int size, BaseLevelTile tile) {
+        int startX = tile.x;
+        int startY = tile.y;
+        for (int x = 0; x < size.x; x++) {
+            for (int y = 0; y < size.y; y++) {
+                if (x == 0 && y == 0)
+                    continue;
+                SetLink(tile, startX + x, startY + y);
+            }
+        }
+    }
+    public void SetLink(BaseLevelTile tile, int otherX, int otherY) {
+        var otherTile = GetITile(otherX, otherY);
+        otherTile.linkedTile = tile;
+    }
+    internal void RemoveLinks(Vector2Int size, BaseLevelTile tile) {
+        int startX = tile.x;
+        int startY = tile.y;
+        for (int x = 0; x < size.x; x++) {
+            for (int y = 0; y < size.y; y++) {
+                if (x == 0 && y == 0)
+                    continue;
+                RemoveLink(tile, startX + x, startY + y);
+            }
+        }
+    }
+    public void RemoveLink(BaseLevelTile tile, int otherX, int otherY) {
+        var otherTile = GetITile(otherX, otherY);
+        if (otherTile.linkedTile == tile)
+            otherTile.linkedTile = null;
+    }
     #region
-    
+
     #endregion
 }

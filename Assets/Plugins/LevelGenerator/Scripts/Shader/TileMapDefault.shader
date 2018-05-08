@@ -2,7 +2,7 @@
 
 // Unity built-in shader source. Copyright (c) 2016 Unity Technologies. MIT license (see license.txt)
 
-Shader "Sprites/Tilemap/Picker"
+Shader "Sprites/Tilemap/Simple"
 {
 	Properties
 	{
@@ -14,15 +14,6 @@ Shader "Sprites/Tilemap/Picker"
 		[PerRendererData] _AlphaTex("External Alpha", 2D) = "white" {}
 		[PerRendererData] _EnableExternalAlpha("Enable External Alpha", Float) = 0
 
-		_1PickColor("1 Picker",Color) = (1,1,1,1)
-		_1Size("1 size",Float) = 5
-		_1Tex("1 Texture", 2D) = "white" {}
-		_2PickColor("2 Picker",Color) = (1,1,1,1)
-		_2Size("2 size",Float) = 5
-		_2Tex("2 Texture", 2D) = "white" {}
-		_3PickColor("3 Picker",Color) = (1,1,1,1)
-		_3Size("3 size",Float) = 5
-		_3Tex("3 Texture", 2D) = "white" {}
 	}
 
 		SubShader
@@ -82,31 +73,12 @@ Shader "Sprites/Tilemap/Picker"
 			return OUT;
 		}
 
-		sampler2D _MainTex,_1Tex,_2Tex,_3Tex;
-		float _1Size,_2Size,_3Size;
-		fixed3 _1PickColor,_2PickColor,_3PickColor;
-		float isColor(fixed3 c1 ,fixed3 c2){
-			float r =0.001;
-			float is =(1-step(c1.r,c2.r-r)) *(1-step(c1.g,c2.g-r)) * (1-step(c1.b,c2.b-r)); 
-			is*=(step(c1.r,c2.r+r)) *(step(c1.g,c2.g+r)) * (step(c1.b,c2.b+r));
-			return is;
-		}
-		fixed3 ColorPicker(fixed4 c,fixed4 oc,fixed2 pos,fixed3 pickCol,sampler2D tex,float size){
-			float picker = isColor(oc,pickCol);
-			fixed4 pickerTex = tex2D(tex, frac(pos/size))*_Color;
-			return lerp(c.rgb,pickerTex.rgb,picker);
-		}
+		sampler2D _MainTex;
+
 		fixed4 frag(v2f IN) : SV_Target
 		{
-			fixed4 c = tex2D(_MainTex, IN.texcoord) * _Color;
-			fixed4 oc = tex2D(_MainTex, IN.texcoord);
-
-			c.rgb = ColorPicker(c,oc,IN.cPos.xy,_1PickColor,_1Tex,_1Size);
-			c.rgb = ColorPicker(c,oc,IN.cPos.xy,_2PickColor,_2Tex,_2Size);
-			c.rgb = ColorPicker(c,oc,IN.cPos.xy,_3PickColor,_3Tex,_3Size);
-
-
-
+			fixed4 c = tex2D(_MainTex, IN.texcoord) * IN.color*_Color;
+			
 			c.rgb *= c.a;
 			return c;
 		}
