@@ -179,6 +179,7 @@ public class LevelTile_Dig : BaseLevelTile {
     }
     #endregion
     #region Light
+    Dictionary<int, LevelTile_Dig> lightSources = new Dictionary<int, LevelTile_Dig>();
     public void EmitLight(LevelTilemap level, LevelTileData_Dig digData) {
         var startX = x;
         var startY = y;
@@ -196,76 +197,25 @@ public class LevelTile_Dig : BaseLevelTile {
         }
     }
     public void AddLight(LevelTilemap level, BaseLevelTile lightSource) {
+        //lightSources.Add(lightSource.x + lightSource.y * level.sizeX, lightSource as LevelTile_Dig);
+        light += CalcuateLight(lightSource as LevelTile_Dig);
+        viewNeedUpdate = true;
         lightSource.onRemove += RemoveLight;
-        AddLightPath(level, lightSource);
+    }
+    public void RemoveLight(LevelTilemap level, BaseLevelTile lightSource) {
+        //lightSources.Remove(lightSource.x + lightSource.y * level.sizeX);
+        light -= CalcuateLight(lightSource as LevelTile_Dig);
         viewNeedUpdate = true;
-
-    }
-    void AddLightPath(LevelTilemap level, BaseLevelTile lightSource) {
-        light += CalculateLight(level, lightSource, true);
-    }
-    void RecaclucateLightPathPre(LevelTilemap level, BaseLevelTile dontNeeded, BaseLevelTile lightSource) {
-        light -= CalculateLight(level, lightSource);
-    }
-    void RecaclucateLightPathPost(LevelTilemap level, BaseLevelTile dontNeeded, BaseLevelTile lightSource) {
-        light += CalculateLight(level, lightSource);
-    }
-    void RemoveLightPath(LevelTilemap level, BaseLevelTile lightSource) {
-        light -= CalculateLight(level, lightSource, true, true);
-    }
-    Dictionary<BaseLevelTile, Action<LevelTilemap, BaseLevelTile>> lightPreActions = new Dictionary<BaseLevelTile, Action<LevelTilemap, BaseLevelTile>>();
-    Dictionary<BaseLevelTile, Action<LevelTilemap, BaseLevelTile>> lightPostActions = new Dictionary<BaseLevelTile, Action<LevelTilemap, BaseLevelTile>>();
-    int CalculateLight(LevelTilemap level, BaseLevelTile lightSource, bool addActions = false, bool removeAction = false) {
-        var sourceData = lightSource.data as LevelTileData_Dig;
-        if (sourceData == null)
-            return 0;
-        var light = sourceData.emitLight;
-        var dir = (new Vector2(x, y) - new Vector2(lightSource.x, lightSource.y));
-        var dist = dir.magnitude;
-        dir.Normalize();
-        var start = lightSource.pos;
-        BaseLevelTile pathTile = null;
-        if (addActions) {
-            if (removeAction == false) {
-                lightPreActions.Add(lightSource, (LevelTilemap, BaseLevelTile) => RecaclucateLightPathPre(level, null, lightSource));
-                lightPostActions.Add(lightSource, (LevelTilemap, BaseLevelTile) => RecaclucateLightPathPost(level, null, lightSource));
-            } 
-        } 
-
-        for (int i = 0; i < (int)dist; i++) {
-            pathTile = level.GetITile((int)(start.x + .5f + dir.x * i), (int)(start.y + .5f + dir.y * i));
-            if (pathTile == this || pathTile == lightSource)
-                continue;
-            var pathData = pathTile.data as LevelTileData_Dig;
-            if (pathData == null)
-                continue;
-            if (addActions) {
-                if (removeAction) {
-                    pathTile.onRemove -= lightPreActions[lightSource];
-                    pathTile.onInit -= lightPostActions[lightSource];
-                } else {
-                    pathTile.onRemove += lightPreActions[lightSource];
-                    pathTile.onInit += lightPostActions[lightSource];
-                }
-
-            }
-
-            light = (int)(light * 1 - pathData.heatAbsorption);
-        }
-        if (addActions) {
-            if (removeAction) { 
-                lightPreActions.Remove(lightSource);
-                lightPostActions.Remove(lightSource);
-            }
-        }
-        return light;
-
-    }
-    void RemoveLight(LevelTilemap level, BaseLevelTile lightSource) {
-        RemoveLightPath(level, lightSource);
         lightSource.onRemove -= RemoveLight;
-        viewNeedUpdate = true;
-
     }
+    float CalcuateLight(LevelTile_Dig lightSource) {
+        var x = Mathf.Abs(this.x - lightSource.pos.x);
+        var y = Mathf.Abs(this.y - lightSource.pos.y);
+        var dis = Mathf.Sqrt(x * x + y * y);
+        var c = Mathf.Clamp01((1 + dis) / (lightSource.data as LevelTileData_Dig).emitLightRange);
+        return (1 - c) * (lightSource.data as LevelTileData_Dig).emitLight;
+    }
+
+   
     #endregion
 }
