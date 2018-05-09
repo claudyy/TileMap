@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: HeatBuilding
   m_EditorClassIdentifier: 
   tile: {fileID: 11400000, guid: ea1c91d3fb508b440a3e4c7d007ec263, type: 2}
-  editorColor: {r: 0, g: 0.3372549, b: 0.5647059, a: 1}
+  editorColor: {r: 0.14070842, g: 0.24823609, b: 0.3207547, a: 1}
   maxHealth: 1
   backgroundTile: {fileID: 0}
   damageFX:
@@ -22,7 +22,7 @@ MonoBehaviour:
   emitHeat: 10
   emitHeatRange: 0
   heatAbsorption: 0
-  baseLight: 0
+  baseLight: 10
   emitLight: 10
   emitLightRange: 4
-  lightAbsorption: 0
+  lightAbsorption: 1

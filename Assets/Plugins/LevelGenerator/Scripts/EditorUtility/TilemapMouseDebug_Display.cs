@@ -6,6 +6,7 @@ public class TilemapMouseDebug_Display : MonoBehaviour {
     public LevelTilemap target;
     StringBuilder str = new StringBuilder();
     private void OnDrawGizmos() {
+#if UNITY_EDITOR
         if (Application.isPlaying == false)
             return;
         var pos = UnityEditor.HandleUtility.GUIPointToWorldRay(Event.current.mousePosition).origin;
@@ -34,6 +35,7 @@ public class TilemapMouseDebug_Display : MonoBehaviour {
             UnityEditor.Handles.color = Color.white;
             UnityEditor.Handles.Label(pos + Vector3.right, str.ToString());
         }
+#endif
     }
 
 }

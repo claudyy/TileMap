@@ -15,12 +15,13 @@ MonoBehaviour:
   editorColor: {r: 1, g: 0.6666667, b: 0, a: 1}
   maxHealth: 6
   backgroundTile: {fileID: 11400000, guid: cc0d164aed80ab240a66808aea541032, type: 2}
-  isTransparent: 0
-  lihgtAbsorption: 1
-  baseLight: 0
   damageFX:
     damageTiles: []
   baseHeat: 0
   emitHeat: 0
   emitHeatRange: 0
   heatAbsorption: 1
+  baseLight: 0
+  emitLight: 0
+  emitLightRange: 0
+  lightAbsorption: 0.2

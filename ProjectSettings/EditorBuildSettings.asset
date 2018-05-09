@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Plugins/LevelGenerator/TileSystems/SideView/DarkCartoon.unity
-    guid: e81315d39f881cf4ba837047f53180a0
+    path: Assets/Plugins/LevelGenerator/TileSystems/DigSideviewTilemap/DigSideView.unity
+    guid: bf1e28b260980bf48927fe086cfa44a8
   m_configObjects: {}

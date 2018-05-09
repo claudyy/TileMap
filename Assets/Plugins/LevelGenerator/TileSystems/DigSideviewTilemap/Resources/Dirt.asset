@@ -15,9 +15,6 @@ MonoBehaviour:
   editorColor: {r: 0.5647059, g: 0.3764706, b: 0, a: 1}
   maxHealth: 4
   backgroundTile: {fileID: 11400000, guid: cc0d164aed80ab240a66808aea541032, type: 2}
-  isTransparent: 0
-  lihgtAbsorption: 1
-  baseLight: 0
   damageFX:
     damageTiles:
     - {fileID: 11400000, guid: c1ea556f6ea27fb4eaca077466bc283c, type: 2}
@@ -25,3 +22,7 @@ MonoBehaviour:
   emitHeat: 0
   emitHeatRange: 0
   heatAbsorption: 1
+  baseLight: 0
+  emitLight: 0
+  emitLightRange: 0
+  lightAbsorption: 0.2

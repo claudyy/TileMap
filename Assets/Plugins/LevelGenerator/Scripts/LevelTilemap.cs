@@ -239,13 +239,19 @@ public abstract class LevelTilemap : MonoBehaviour {
     #region Load Save
     public void Load() {
         XmlSerializer serializer = new XmlSerializer(typeof(TileMapSaveData));
+        if(Application.isEditor == false) {
+            TextAsset textAsset = (TextAsset)Resources.Load(saveUtility.fileName);
+            XmlDocument xmldoc = new XmlDocument();
+            xmldoc.LoadXml(textAsset.text);
+            XmlReader reader = new XmlNodeReader(xmldoc);
+            TileMapSaveData result = (TileMapSaveData)serializer.Deserialize(reader);
+
+            Load(result);
+            return;
+        }
         FileStream stream = new FileStream(saveUtility.GetPath(), FileMode.Open);
 
-        //TextAsset textAsset = (TextAsset)Resources.Load(saveUtility.fileName);
-        //XmlDocument xmldoc = new XmlDocument();
-        //xmldoc.LoadXml(textAsset.text);
-        //XmlReader reader = new XmlNodeReader(xmldoc);
-        //TileMapSaveData result = (TileMapSaveData)serializer.Deserialize(reader);
+
 
         var st = serializer.Deserialize(stream) as TileMapSaveData;
         stream.Close();
