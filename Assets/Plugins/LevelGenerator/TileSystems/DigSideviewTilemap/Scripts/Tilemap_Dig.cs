@@ -182,7 +182,7 @@ public class Tilemap_Dig : LevelTilemap {
         var data = tile.data as LevelTileData_Dig;
 
         if (data != null) {
-            return data.lightAbsorption;
+            return data.isTranslucent? 0 : 1;
         } else {
 
             return 1;
