@@ -56,6 +56,7 @@ public class Tilemap_Dig : LevelTilemap {
     }
     public override void LoadTileFirstTime(BaseLevelTile tile) {
         base.LoadTileFirstTime(tile);
+        waterTileMap.SetTile(IndexToTilemap(tile.pos), waterTile);
         var data = tile.data;
         if (data == null)
             return;
@@ -67,6 +68,7 @@ public class Tilemap_Dig : LevelTilemap {
         lightMap.SetTile(IndexToTilemap(tile.pos), lightTile);
         sunLightMap.RemoveTileFlags(IndexToTilemap(tile.pos), TileFlags.LockColor);
         sunLightMap.SetTile(IndexToTilemap(tile.pos), lightTile);
+
         var digTile = tile as LevelTile_Dig;
         if (digTile != null) {
             Color c = Color.white;
@@ -99,7 +101,7 @@ public class Tilemap_Dig : LevelTilemap {
                 damageTileMap.SetTile(IndexToTilemap(pos), digData.damageFX.GetDamageTile(tile.HealthPercent));
             else
                 damageTileMap.SetTile(IndexToTilemap(pos), defaultDamageFX.GetDamageTile(tile.HealthPercent));
-
+            tilemap.SetColor(IndexToTilemap(pos), new Color(tile.HealthPercent, 1, 1, 1));
         } else {
 
             damageTileMap.SetTile(IndexToTilemap(pos), null);
@@ -118,6 +120,13 @@ public class Tilemap_Dig : LevelTilemap {
 
 
         base.UpdateViewTile(tile);
+    }
+    public override Color GetLookUpTextureColor(BaseLevelTile tile) {
+        var water = (float)(tile as LevelTile_Dig).GetWaterAmount() / LevelTile_Dig.maxWater;
+        if (IsPosOutOfBound(tile.x, tile.y + 1) == false && (tile as LevelTile_Dig).isWalkable == false && GetTile<LevelTile_Dig>(tile.x, tile.y + 1).HasWater())
+            water = 1;
+
+        return new Color(1, water, (tile as LevelTile_Dig).sunLight, (tile as LevelTile_Dig).GetLight(true));
     }
     #region Light
     public void LightOnPos(int x, int posY, bool sunLight = false) {

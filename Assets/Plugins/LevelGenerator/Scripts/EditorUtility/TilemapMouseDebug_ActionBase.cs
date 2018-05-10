@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class TilemapMouseDebug_ActionBase : MonoBehaviour {
     public LevelTilemap target;
-    public bool active;
 
 	// Update is called once per frame
 	void Update () {
@@ -15,7 +14,7 @@ public class TilemapMouseDebug_ActionBase : MonoBehaviour {
         pos.y = Mathf.Floor(pos.y);
         var tile = target.GetITile((int)pos.x, (int)pos.y,false);
 
-        if (active && tile != null && Input.GetMouseButtonDown(0)) {
+        if (tile != null && Input.GetMouseButtonDown(0)) {
             ActionOnTile(tile);
         }
     }

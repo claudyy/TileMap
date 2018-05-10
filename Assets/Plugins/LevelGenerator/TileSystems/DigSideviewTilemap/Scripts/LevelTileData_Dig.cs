@@ -18,6 +18,8 @@ public class LevelTileData_Dig : LevelTileData {
     public int emitLight;
     public int emitLightRange;
     public bool isTranslucent = false;
+    public bool isWalkable;
+
     internal TileBase GetBackgroundTile(Tilemap_Dig tilemap_Dig, int x, int y) {
         if (tilemap_Dig.IsEmpty(x, y + 1) == false)
             return backgroundTile;

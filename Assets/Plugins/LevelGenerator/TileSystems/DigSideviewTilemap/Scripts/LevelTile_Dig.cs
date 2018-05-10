@@ -13,11 +13,11 @@ public class LevelTile_Dig : BaseLevelTile {
         }
     }
 
-    internal int GetWaterAmount() {
-        return 0;
+    public int GetWaterAmount() {
+        return liquidAmount;
     }
 
-    internal int GetHeat() {
+    public int GetHeat() {
         return heat + (inSunLight == true ?  10 : 0);
     }
 
@@ -32,12 +32,25 @@ public class LevelTile_Dig : BaseLevelTile {
     public bool inSunLight;
     public float sunLight;
     float light;
+
+
+    public bool isWalkable {
+        get {
+            if (data != null && (data is LevelTileData_Dig))
+                return (data as LevelTileData_Dig).isWalkable;
+            return true;
+        }
+    }
     public float HealthPercent {
         get {
             return (float)currentHealth / MaxHealth;
         }
     }
-
+    public override bool HaveBehaviorViewUpdate() {
+        if (HasWater())
+            return true;
+        return base.HaveBehaviorViewUpdate();
+    }
     public override void Init(LevelTilemap level, LevelTileData data, Vector3Int pos) {
         base.Init(level, data, pos);
         currentHealth = MaxHealth;
@@ -55,6 +68,11 @@ public class LevelTile_Dig : BaseLevelTile {
             EmitLight(level, digData);
         }
 
+    }
+    public override void UpdateBehaviorInViewTile(LevelTilemap level) {
+        base.UpdateBehaviorInViewTile(level);
+        if (HasWater())
+            UpdateWater(level);
     }
     public override void Remove(LevelTilemap level) {
         base.Remove(level);
@@ -79,7 +97,122 @@ public class LevelTile_Dig : BaseLevelTile {
             return "";
         return "Health" + HealthPercent;
     }
+    #region Water
+    float curWaterDelay;
+    public const float flowSpeed =.1f;
+    int liquidAmount;
+    bool erase;
+    float delayedErase;
+    public const float delayedEraseMax =1;
+    public const int stickAmount = 10;
+    public const int flowAmount = 5;
+    public const int maxWater = 100;
+    public bool IsFull() {
+        return liquidAmount >= maxWater;
+    }
+    public bool HasWater() {
+        return liquidAmount > 0;
+    }
+    bool DelayErase(LevelTilemap level, LevelTile_Dig tile) {
+        if (liquidAmount > 0) {
+            erase = false;
+            delayedErase = delayedEraseMax;
+        }
+        if (erase == false)
+            return false;
+        delayedErase -= inViewdeltaTime;
+        if (delayedErase >= 0)
+            return false;
+        return true;
+    }
+    void UpdateWater(LevelTilemap level) {
 
+        if (DelayErase(level, this))
+            return;
+        curWaterDelay -= inViewdeltaTime;
+        if (curWaterDelay >= 0)
+            return;
+        curWaterDelay = flowSpeed;
+        if (liquidAmount > 0) {
+            if (CanFlowToPos(x, y - 1, level) == true) {
+                FlowDown(x, y - 1, level, this);
+            } else {
+                int dir = (int)Mathf.Sign(UnityEngine.Random.Range(-1, 1));
+                Flow(dir, level, this);
+            }
+        }
+        viewNeedUpdate = true;
+    }
+    void Flow(int dirX, LevelTilemap level, LevelTile_Dig tile) {
+        int targetX = tile.pos.x + dirX;
+        int targetY = tile.pos.y;
+        if (CanFlowToPos(targetX, targetY, level) == false)
+            return;
+        if (liquidAmount <= stickAmount)
+            return;
+
+        FillOtherLiquid(tile, level.GetTile<LevelTile_Dig>(targetX, targetY), level);
+
+
+        //if (liquidAmount <= 0)
+        //    StartErase();
+    }
+    void FlowDown(int x, int y, LevelTilemap level, LevelTile_Dig tile) {
+        if (CanFlowToPos(x, y, level) == false)
+            return;
+        if (liquidAmount <= 0)
+            return;
+
+        FillOtherLiquid(tile, level.GetTile<LevelTile_Dig>(x, y), level);
+
+    }
+
+
+
+    bool NeighbourHasLessWater(LevelTile_Dig neighbour) {
+        return liquidAmount - neighbour.liquidAmount > flowAmount;
+    }
+
+    bool CanFlowToPos(int x, int y, LevelTilemap level) {
+        if (level.IsPosOutOfBound(x, y))
+            return false;
+
+        var target = level.GetTile<LevelTile_Dig>(x, y);
+        if (target.isWalkable) {
+            if(target.IsFull() == false)
+                return true;
+        }
+
+        return false;
+    }
+    protected void FillOtherLiquid(LevelTile_Dig self, LevelTile_Dig otherTile, LevelTilemap level) {
+        int value = Mathf.Clamp(flowAmount, 0, liquidAmount);
+        otherTile.AddWater(level, value);
+        self.RemoveWater(level, value);
+    }
+    public void AddWater(LevelTilemap level, int amount) {
+        if (HasWater()) {
+            liquidAmount += amount;
+        } else {
+            liquidAmount = amount;
+            level.GetITile(x, y - 1).viewNeedUpdate = true;
+        }
+        viewNeedUpdate = true;
+        level.ChangedTile(this);
+    }
+    public void RemoveWater(LevelTilemap level, int amount) {
+        if (HasWater()) {
+            liquidAmount = Mathf.Max(liquidAmount - amount, 0);
+            if (liquidAmount <= 0) {
+                erase = true;
+                delayedErase = .4f;
+                level.GetITile(x, y - 1).viewNeedUpdate = true;
+            }
+            level.ChangedTile(this);
+        }
+        viewNeedUpdate = true;
+    }
+    #endregion
     #region Heat
     public void EmitHeat(LevelTilemap level, LevelTileData_Dig digData) {
         var startX = x;

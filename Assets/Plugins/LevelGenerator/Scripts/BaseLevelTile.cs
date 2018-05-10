@@ -12,6 +12,12 @@ public abstract class BaseLevelTile {
     public int y;
 
     public bool viewNeedUpdate;
+    float lastUpdateTime = 0;
+    public float deltaTime;
+    float inViewlastUpdateTime = 0;
+    public float inViewdeltaTime;
+
+
     BaseTileMapGameobject go;
     public BaseLevelTile linkedTile;
     public Action<LevelTilemap,BaseLevelTile> onRemove;
@@ -36,12 +42,16 @@ public abstract class BaseLevelTile {
             onInit(level, this);
     }
     public virtual void UpdateBehaviorTile(LevelTilemap level) {
+        deltaTime = Time.time - lastUpdateTime;
         if (behavior != null)
-            behavior.Update(level, this);
+            behavior.Update(level, this, deltaTime);
+        lastUpdateTime = Time.time;
     }
     public virtual void UpdateBehaviorInViewTile(LevelTilemap level) {
+        inViewdeltaTime = Time.time - inViewlastUpdateTime;
         if (behavior != null)
-            behavior.UpdateInView(level, this);
+            behavior.UpdateInView(level, this, inViewdeltaTime);
+        inViewlastUpdateTime = Time.time;
     }
 
     public virtual bool IsEmpty() {
@@ -60,7 +70,7 @@ public abstract class BaseLevelTile {
     public bool HaveBehavior() {
         return behavior != null;
     }
-    public bool HaveBehaviorViewUpdate() {
+    public virtual bool HaveBehaviorViewUpdate() {
         if (HaveBehavior() == false)
             return false;
         return behavior.NeedUpdateView();

@@ -92,7 +92,7 @@ public class SubTileMap{
     public void Erase(Vector3Int pos, LevelTilemap level)
     {
         RemoveTile(level,pos.x, pos.y);
-        GetTile(pos.x, pos.y).OverrideData(level,null,pos);
+        GetTile(pos.x, pos.y).OverrideData(level,null,ToTilePosition(pos.x,pos.y));
         //UpdateTile(pos.x, pos.y, level);
     }
     
@@ -133,8 +133,7 @@ public class SubTileMap{
         return tilesData[x + y * chunkSize];
     }
 
-    public virtual void ChangedTile(int x, int y) {
-        var tile = GetTile(x, y);
+    public virtual void ChangedTile(BaseLevelTile tile) {
         if (tile.HaveBehaviorUpdate())
             updateTiles.Add(tile);
         if (tile.HaveBehaviorViewUpdate())

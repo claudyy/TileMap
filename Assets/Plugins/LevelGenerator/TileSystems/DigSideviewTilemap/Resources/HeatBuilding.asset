@@ -25,4 +25,4 @@ MonoBehaviour:
   baseLight: 10
   emitLight: 10
   emitLightRange: 12
-  lightAbsorption: 1
+  isTranslucent: 0

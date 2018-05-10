@@ -13,4 +13,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tile: {fileID: 0}
   editorColor: {r: 0.63529414, g: 0.9568628, b: 1, a: 1}
-  background: {fileID: 0}
+  maxHealth: 0
+  backgroundTile: {fileID: 0}
+  damageFX:
+    damageTiles: []
+  baseHeat: 0
+  emitHeat: 0
+  emitHeatRange: 0
+  heatAbsorption: 0
+  baseLight: 0
+  emitLight: 0
+  emitLightRange: 0
+  isTranslucent: 1
+  isWalkable: 1

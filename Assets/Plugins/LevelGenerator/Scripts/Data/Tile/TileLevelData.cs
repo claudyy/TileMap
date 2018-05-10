@@ -6,21 +6,16 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 public class BaseTileBehvior
 {
-    float lastUpdateTime = 0;
-    public float deltaTime;
-    float inViewlastUpdateTime = 0;
-    public float inViewdeltaTime;
+
     public virtual void Init(LevelTilemap level, BaseLevelTile tile)
     {
     }
-    public virtual void Update(LevelTilemap level, BaseLevelTile tile)
+    public virtual void Update(LevelTilemap level, BaseLevelTile tile,float deltaTime)
     {
-        deltaTime = Time.time - lastUpdateTime;
-        lastUpdateTime = Time.time;
+
     }
-    public virtual void UpdateInView(LevelTilemap level, BaseLevelTile tile) {
-        inViewdeltaTime = Time.time - inViewlastUpdateTime;
-        inViewlastUpdateTime = Time.time;
+    public virtual void UpdateInView(LevelTilemap level, BaseLevelTile tile, float deltaTime) {
+
     }
     public virtual TileBase GetTile(BaseLevelTile tile, LevelTilemap level) {
         return tile.data.GetTile();

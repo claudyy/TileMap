@@ -23,6 +23,8 @@ Shader "Sprites/Tilemap/Picker"
 		_3PickColor("3 Picker",Color) = (1,1,1,1)
 		_3Size("3 size",Float) = 5
 		_3Tex("3 Texture", 2D) = "white" {}
+
+		_DissolveTex("3 Texture", 2D) = "white" {}
 	}
 
 		SubShader
@@ -82,7 +84,7 @@ Shader "Sprites/Tilemap/Picker"
 			return OUT;
 		}
 
-		sampler2D _MainTex,_1Tex,_2Tex,_3Tex;
+		sampler2D _MainTex,_1Tex,_2Tex,_3Tex,_DissolveTex;
 		float _1Size,_2Size,_3Size;
 		fixed3 _1PickColor,_2PickColor,_3PickColor;
 		float isColor(fixed3 c1 ,fixed3 c2){
@@ -105,8 +107,11 @@ Shader "Sprites/Tilemap/Picker"
 			c.rgb = ColorPicker(c,oc,IN.cPos.xy,_2PickColor,_2Tex,_2Size);
 			c.rgb = ColorPicker(c,oc,IN.cPos.xy,_3PickColor,_3Tex,_3Size);
 
+			fixed4 destroy = tex2D(_DissolveTex, frac(IN.cPos.xy));
+			float breakBlend = 1-IN.color.r;
 
-
+			c.rgb*=smoothstep(breakBlend,breakBlend +.2,destroy);
+			c.a*=smoothstep(breakBlend,breakBlend,destroy);
 			c.rgb *= c.a;
 			return c;
 		}

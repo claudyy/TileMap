@@ -47,7 +47,7 @@ public abstract class LevelTilemap : MonoBehaviour {
     public bool loadAllChunks;
     public bool onlyUpdateVisible;
     public bool dontUpdate;
-
+    public bool useLUT;
     public int sizeX;
     public int sizeY;
     public SaveUtility saveUtility;
@@ -153,6 +153,8 @@ public abstract class LevelTilemap : MonoBehaviour {
     protected virtual void Init() {
         sizeX = levelChunkX* chunkSize;
         sizeY = levelChunkY* chunkSize;
+        if (useLUT)
+            InitRenderTextures();
     }
     void SetupChunks() {
         tileMapList = new Dictionary<int, SubTileMap>();
@@ -188,6 +190,7 @@ public abstract class LevelTilemap : MonoBehaviour {
         yield return null;
         updateVisibleCoroutine = StartCoroutine(UpdateVisible());
         lastMidChunk = midChunk;
+        
     }
     public virtual void LoadChunkFirstTime(int cx, int cy) {
         var chunk = GetTileMap(cx, cy);
@@ -220,6 +223,7 @@ public abstract class LevelTilemap : MonoBehaviour {
                     tiles[x + y * chunkSize] = null;
                     pos[x + y * chunkSize] = vec3IntTemp;
                 }
+
                 dataTemp = null;
                 tileViewTemp = null;
             }
@@ -229,10 +233,20 @@ public abstract class LevelTilemap : MonoBehaviour {
     }
     public virtual void UpdateVisibleChunk(int x,int y) {
         GetTileMap(x, y).UpdateInView(this);
+        Vector3Int midChunk = PosToChunk((int)Camera.main.transform.position.x, (int)Camera.main.transform.position.y);
+        vec3IntTemp.x = x - midChunk.x;//dir
+        vec3IntTemp.y = y - midChunk.y;
+        vec3IntTemp.z = 0;
+        if (useLUT) {
+            SetRenderTexture(vec3IntTemp.x, vec3IntTemp.y, GetRenderAllTexutre(x, y));
+            Shader.SetGlobalVector("_ChunckCenterPos", new Vector4(midChunk.x, midChunk.y, 0, 0));
+            Shader.SetGlobalFloat("_ChunkSize", chunkSize);
+        }
     }
     
     public virtual void LoadTileFirstTime(BaseLevelTile tile) {
-
+        if (useLUT)
+            UpdateRenderTexutre(tile);
     }
 
 
@@ -428,18 +442,18 @@ public abstract class LevelTilemap : MonoBehaviour {
     {
         return tileMapList[x + y * levelChunkX];
     }
-    public void UpdateViews()
+    public void UpdateAllViews()
     {
         for (int x = 0; x < levelChunkX; x++)
         {
             for (int y = 0; y < levelChunkY; y++)
             {
-                GetTileMap(x, y).UpdateViewChunke(this);
+                StartCoroutine(GetTileMap(x, y).UpdateViewChunke(this));
             }
         }
     }
     public void UpdateViews(int x, int y) {
-        GetTileMap(PosToChunk(x,y).x, PosToChunk(x, y).y).UpdateViewChunke(this);
+        StartCoroutine(GetTileMap(PosToChunk(x,y).x, PosToChunk(x, y).y).UpdateViewChunke(this));
     }
     public T GetTile<T>(Vector2Int pos, bool ignoreLinkedTile = true) where T: BaseLevelTile {
         return GetTile<T>(pos.x,pos.y, ignoreLinkedTile);
@@ -463,7 +477,6 @@ public abstract class LevelTilemap : MonoBehaviour {
             return (T)GetTileMap(chunkPosX, chunkPosY).GetTile(posX, posY).linkedTile;
         return (T)GetTileMap(chunkPosX, chunkPosY).GetTile(posX, posY);
     }
-    //[Button]
     public void Hide()
     {
         for (int x = 0; x < levelChunkX; x++)
@@ -514,7 +527,7 @@ public abstract class LevelTilemap : MonoBehaviour {
     public void Erase(int x, int y) {
         var tilemap = GetTileMap(PosToChunk(x,y).x, PosToChunk(x,y).y);
         tilemap.Erase(PosToPosInChunk(x,y),this);
-        SetTile(IndexToTilemap(x, y), null);
+        //SetTile(IndexToTilemap(x, y), null);
     }
     public void Erase(Vector2Int pos) {
         Erase(pos.x, pos.y);
@@ -611,13 +624,15 @@ public abstract class LevelTilemap : MonoBehaviour {
         } else {
             tilemap.SetTile(vec3IntTemp, null);
         }
+        if (useLUT)
+            UpdateRenderTexutre(tile);
         tile.viewNeedUpdate = false;
     }
-    public virtual void ChangedTile(ITile tile) {
-        var x = tile.pos.x;
-        var y = tile.pos.y;
+    public virtual void ChangedTile(BaseLevelTile tile) {
+        var x = tile.x;
+        var y = tile.y;
         var tilemap = GetTileMap(PosToChunk(x, y).x, PosToChunk(x, y).y);
-        tilemap.ChangedTile(PosToPosInChunk(x, y).x, PosToPosInChunk(x, y).y);
+        tilemap.ChangedTile(tile);
     }
     public virtual void DestroyTile(BaseLevelTile tile) {
         Erase(tile.x,tile.y);
@@ -669,7 +684,83 @@ public abstract class LevelTilemap : MonoBehaviour {
         if (otherTile.linkedTile == tile)
             otherTile.linkedTile = null;
     }
-    #region
+    #region LookUpTexture
+    RenderTexture[] chunksRT;
+    public RenderTexture[] allChunksRT;
+    RenderTexture chunkBufferColor;
+    public Material colorDrawer;
+    void InitRenderTextures() {
+        colorDrawer = new Material(Shader.Find("Hidden/PixelDrawer"));
+        chunkBufferColor = CreateRenderTexture();
+        chunksRT = new RenderTexture[9];
+        for (int i = 0; i < chunksRT.Length; i++) {
+            chunksRT[i] = CreateRenderTexture();
+        }
+        allChunksRT = new RenderTexture[levelChunkX * levelChunkY];
+        for (int x = 0; x < levelChunkX; x++) {
+            for (int y = 0; y < levelChunkY; y++) {
+                allChunksRT[x + y * levelChunkX] = CreateRenderTexture();
+            }
+        }
+    }
+    bool RenderTextureIndexInOfRange(int x, int y) {
+        if (x < -1 || x > 1)
+            return false;
+        if (y < -1 || y > 1)
+            return false;
+        return true;
+    }
+    RenderTexture GetRenderTexutre(int x, int y) {
+        if (RenderTextureIndexInOfRange(x, y) == false)
+            return null;
 
+        return chunksRT[1 + x + (1 + y) * 3];
+    }
+    
+    void SetRenderTexture(int x, int y, RenderTexture rt) {
+        if (RenderTextureIndexInOfRange(x, y) == false)
+            return;
+        chunksRT[1 + x + (1 + y) * 3] = rt;
+        Shader.SetGlobalTexture("_ChunckCenterTex", GetRenderTexutre(0, 0));
+        Shader.SetGlobalTexture("_ChunckLeftTex", GetRenderTexutre(-1, 0));
+        Shader.SetGlobalTexture("_ChunckTopTex", GetRenderTexutre(0, 1));
+        Shader.SetGlobalTexture("_ChunckRightTex", GetRenderTexutre(1, 0));
+        Shader.SetGlobalTexture("_ChunckBottomTex", GetRenderTexutre(0, -1));
+        Shader.SetGlobalTexture("_ChunckTopLeftTex", GetRenderTexutre(-1, 1));
+        Shader.SetGlobalTexture("_ChunckTopRightTex", GetRenderTexutre(1, 1));
+        Shader.SetGlobalTexture("_ChunckBottomRightTex", GetRenderTexutre(1, -1));
+        Shader.SetGlobalTexture("_ChunckBottomLeftTex", GetRenderTexutre(-1, -1));
+        
+    }
+    RenderTexture GetRenderAllTexutre(int x, int y) {
+
+        return allChunksRT[x + y * levelChunkX];
+    }
+    RenderTexture CreateRenderTexture() {
+        var r = new RenderTexture(chunkSize, chunkSize, 16);
+        r.filterMode = FilterMode.Point;
+        r.wrapMode = TextureWrapMode.Clamp;
+        return r;
+    }
+    void UpdateRenderTexutre(BaseLevelTile tile, RenderTexture rt) {
+
+        colorDrawer.SetFloat("_ChunckSize", chunkSize);
+        var pos = PosToPosInChunk(tile.pos.x, tile.pos.y);
+        colorDrawer.SetFloat("_PosX", pos.x);
+        colorDrawer.SetFloat("_PosY", pos.y);
+        Color c = GetLookUpTextureColor(tile);
+        colorDrawer.SetColor("_Color", c);
+
+        Graphics.Blit(rt, chunkBufferColor);
+        Graphics.Blit(chunkBufferColor, rt, colorDrawer);
+
+    }
+    void UpdateRenderTexutre(BaseLevelTile tile) {
+        vec3IntTemp = PosToChunk(tile.x, tile.y);
+        UpdateRenderTexutre(tile, allChunksRT[vec3IntTemp.x + vec3IntTemp.y*levelChunkX]);
+    }
+    public virtual Color GetLookUpTextureColor(BaseLevelTile tile) {
+        return Color.white;
+    }
     #endregion
 }
