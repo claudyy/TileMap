@@ -52,7 +52,6 @@
 #pragma fragment frag
 #pragma multi_compile DUMMY PIXELSNAP_ON
 #include "UnityCG.cginc"
-#include "/Assets/FogLib.cginc"
 #include "/Assets/Plugins/LevelGenerator/Scripts/Shader/TilemapLib.cginc"
 			struct appdata_t
 		{

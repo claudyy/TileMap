@@ -51,18 +51,24 @@ public abstract class LevelTilemap : MonoBehaviour {
     public int sizeX;
     public int sizeY;
     public SaveUtility saveUtility;
+    public Action<LevelTilemap> onLoaded;
+    public Action<LevelTilemap> onLoadChunk;
+    public Action<LevelTilemap,Vector2Int,Vector3Int> onLoadChunkNewMidChunk;
+    public Action<LevelTilemap,BaseLevelTile> onLoadTileFirstTime;
+    public Action<LevelTilemap, BaseLevelTile> onInitTile;
+    public Action<LevelTilemap, BaseLevelTile> onRemoveTile;
 
     private void Awake()
     {
-        if (loadOnAwake) {
-            Load();
-        }
+        
     }
     protected Coroutine updateVisibleCoroutine;
     protected Coroutine updateAllCoroutine;
     private void Start() {
 
-
+        if (loadOnAwake) {
+            Load();
+        }
     }
     protected virtual void InitChunkFromDataName() {
         for (int x = 0; x < levelChunkX; x++) {
@@ -183,7 +189,7 @@ public abstract class LevelTilemap : MonoBehaviour {
         for (int x = fromX; x <= toX; x++) {
             for (int y = fromY; y <= toY; y++) {
                 if(midChunk != lastMidChunk)
-                    LoadChunkFirstTime(x, y);
+                    LoadChunkNewMidChunk(x, y,midChunk);
                 UpdateVisibleChunk(x, y);
             }
         }
@@ -191,6 +197,13 @@ public abstract class LevelTilemap : MonoBehaviour {
         updateVisibleCoroutine = StartCoroutine(UpdateVisible());
         lastMidChunk = midChunk;
         
+    }
+    public virtual void LoadChunkNewMidChunk(int cx, int cy, Vector3Int midChunk) {
+        var chunk = GetTileMap(cx, cy);
+        if (chunk.isLoaded == false)
+            LoadChunkFirstTime(cx,cy);
+        if (onLoadChunkNewMidChunk != null)
+            onLoadChunkNewMidChunk(this,new Vector2Int(cx,cy), midChunk);
     }
     public virtual void LoadChunkFirstTime(int cx, int cy) {
         var chunk = GetTileMap(cx, cy);
@@ -247,6 +260,8 @@ public abstract class LevelTilemap : MonoBehaviour {
     public virtual void LoadTileFirstTime(BaseLevelTile tile) {
         if (useLUT)
             UpdateRenderTexutre(tile);
+        if (onLoadTileFirstTime != null)
+            onLoadTileFirstTime(this, tile);
     }
 
 
@@ -313,6 +328,9 @@ public abstract class LevelTilemap : MonoBehaviour {
         str.Append("UpdateView : ");
         w.Reset();
         w.Start();
+        if (onLoaded != null)
+            onLoaded(this);
+
         //UpdateViews();
         if (loadAllChunks) {
             for (int x = 0; x < levelChunkX; x++) {
@@ -494,6 +512,11 @@ public abstract class LevelTilemap : MonoBehaviour {
         int chunkPosY = y / chunkSize;
         return new Vector3Int(chunkPosX, chunkPosY, 0);
     }
+    public Vector2Int PosToChunkVec2(int x, int y) {
+        int chunkPosX = x / chunkSize;
+        int chunkPosY = y / chunkSize;
+        return new Vector2Int(chunkPosX, chunkPosY);
+    }
     public Vector3Int PosToPosInChunk(int x,int y)
     {
         int posX = x % chunkSize;
@@ -640,7 +663,8 @@ public abstract class LevelTilemap : MonoBehaviour {
     }
 
     public virtual void InitTile(BaseLevelTile tile) {
-
+        if (onInitTile != null)
+            onInitTile(this, tile);
     }
     public bool CanSetLinkedTile(Vector2Int size, BaseLevelTile tile) {
         int startX = tile.x;

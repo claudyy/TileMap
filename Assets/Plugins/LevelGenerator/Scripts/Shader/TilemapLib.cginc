@@ -30,7 +30,7 @@ float InChunk(float2 pos,float2 chunk){
 	v *= 1-step(chunk.y+1,floor(pos).y/_ChunkSize);
 	return v;
 }
-fixed4 ChunkColor(float2 pos,in out fixed4 OrignalCol,float2 chunkPos,sampler2D chunkTex){
+fixed4 ChunkColor(float2 pos,in fixed4 OrignalCol,float2 chunkPos,sampler2D chunkTex){
 	float2 inChunkPos = frac(floor(pos+fixed2(0,0))/_ChunkSize);
 	float inChunk = InChunk(pos,chunkPos);
 	fixed4 color = tex2D(chunkTex, inChunkPos);

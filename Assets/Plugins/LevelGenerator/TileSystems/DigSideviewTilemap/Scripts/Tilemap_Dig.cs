@@ -6,11 +6,9 @@ public class Tilemap_Dig : LevelTilemap {
     public TileBase lightTile;
     public TileBase waterTile;
     public Tilemap backgroundTileMap;
-    public Tilemap sunLightMap;
     public Tilemap lightMap;
     public Tilemap objectTileMap;
     public Tilemap waterTileMap;
-    public Tilemap damageTileMap;
     public Info_DamageTileFX defaultDamageFX;
     public override BaseLevelTile CreateTile(Vector3Int pos, LevelTileData data) {
         return new LevelTile_Dig();
@@ -24,11 +22,9 @@ public class Tilemap_Dig : LevelTilemap {
     public override void ClearTilemap() {
         base.ClearTilemap();
         backgroundTileMap.ClearAllTiles();
-        sunLightMap.ClearAllTiles();
         lightMap.ClearAllTiles();
         objectTileMap.ClearAllTiles();
         waterTileMap.ClearAllTiles();
-        damageTileMap.ClearAllTiles();
     }
     public override void OverrideTile(int x, int y, LevelTileData data) {
         base.OverrideTile(x, y, data);
@@ -56,7 +52,10 @@ public class Tilemap_Dig : LevelTilemap {
     }
     public override void LoadTileFirstTime(BaseLevelTile tile) {
         base.LoadTileFirstTime(tile);
+
         waterTileMap.SetTile(IndexToTilemap(tile.pos), waterTile);
+        lightMap.SetTile(IndexToTilemap(tile.pos), lightTile);
+
         var data = tile.data;
         if (data == null)
             return;
@@ -64,20 +63,11 @@ public class Tilemap_Dig : LevelTilemap {
         if (digData == null)
             return;
         SetBackground(tile.x, tile.y, digData.GetBackgroundTile(this, tile.x, tile.y));
-        lightMap.RemoveTileFlags(IndexToTilemap(tile.pos), TileFlags.LockColor);
-        lightMap.SetTile(IndexToTilemap(tile.pos), lightTile);
-        sunLightMap.RemoveTileFlags(IndexToTilemap(tile.pos), TileFlags.LockColor);
-        sunLightMap.SetTile(IndexToTilemap(tile.pos), lightTile);
 
-        var digTile = tile as LevelTile_Dig;
-        if (digTile != null) {
-            Color c = Color.white;
-            c.a = digTile.inSunLight ? 1 : 0;
-            sunLightMap.SetColor(IndexToTilemap(digTile.pos), c);
-            c.a = digTile.GetLight(true);
-            lightMap.SetColor(IndexToTilemap(digTile.pos), c);
 
-        }
+        
+
+
 
     }
     public override void EditorApplySaveFileToTile(int x, int y, LevelTileData data) {
@@ -97,27 +87,13 @@ public class Tilemap_Dig : LevelTilemap {
 
         if (tile.currentHealth > 0) {
             var digData = tile.data as LevelTileData_Dig;
-            if (digData != null && digData.damageFX.IsEmpty() == false)
-                damageTileMap.SetTile(IndexToTilemap(pos), digData.damageFX.GetDamageTile(tile.HealthPercent));
-            else
-                damageTileMap.SetTile(IndexToTilemap(pos), defaultDamageFX.GetDamageTile(tile.HealthPercent));
             tilemap.SetColor(IndexToTilemap(pos), new Color(tile.HealthPercent, 1, 1, 1));
-        } else {
-
-            damageTileMap.SetTile(IndexToTilemap(pos), null);
-        }
+        } 
     }
     
     public override void UpdateViewTile(BaseLevelTile tile) {
         if (tile.viewNeedUpdate == false)
             return;
-        var digTile = tile as LevelTile_Dig;
-        Color c = Color.white;
-        c.a = digTile.inSunLight ? 1 : 0;
-        sunLightMap.SetColor(IndexToTilemap(digTile.pos), c);
-        c.a = digTile.GetLight(true);
-        lightMap.SetColor(IndexToTilemap(digTile.pos), c);
-
 
         base.UpdateViewTile(tile);
     }
