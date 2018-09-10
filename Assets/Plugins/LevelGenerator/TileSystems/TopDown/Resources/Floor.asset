@@ -10,6 +10,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ef29f55224328a47b46ef797aa96848, type: 3}
   m_Name: Floor
-  m_EditorClassIdentifier: 
-  tile: {fileID: 11400000, guid: 903a7e8c1841e0444984b28c413c6750, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp-firstpass::LevelTileData
+  tile: {fileID: 11400000, guid: 8eec9dbe68916bb44abb600dd1ad0c3e, type: 2}
+  isWalkable: 1
   editorColor: {r: 0, g: 1, b: 1, a: 1}

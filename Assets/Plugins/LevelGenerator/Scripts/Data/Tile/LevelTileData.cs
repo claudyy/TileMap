@@ -52,6 +52,7 @@ public class BaseTileBehvior
 public class LevelTileData : ScriptableObject{
 
     public TileBase tile;
+    public bool isWalkable;
     public Color editorColor;
     public virtual BaseTileBehvior GetBehavior()
     {

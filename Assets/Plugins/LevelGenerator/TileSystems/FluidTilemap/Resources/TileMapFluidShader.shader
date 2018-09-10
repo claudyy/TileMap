@@ -6,7 +6,9 @@
 		_SmokeColor("Smoke Color", Color) = (1,1,1,1)
 		_SmokeFadeColor("Smoke Fade Color", Color) = (1,1,1,1)
 		_DetailTex ("Texture", 2D) = "white" {}
+		_DetailBlend("Detail Blend",Range(0,1)) = 1
 		_AddDetailTex ("Add Texture", 2D) = "white" {}
+		_AddDetailBlend("addDetail Blend",Range(0,1)) = 1
 		_DisplayDetailTex ("Add Texture", 2D) = "white" {}
 	}
 	SubShader
@@ -43,6 +45,7 @@
 			sampler2D _MainTex,_DetailTex,_AddDetailTex,_DisplayDetailTex;
 			float4 _MainTex_ST;
 			fixed4 _SmokeColor,_SmokeFadeColor;
+			fixed _DetailBlend,_AddDetailBlend;
 			uniform sampler2D _FluidCenterTex;
 			uniform sampler2D _FluidLeftTex;
 			uniform sampler2D _FluidTopTex;
@@ -100,7 +103,7 @@
 				displace*=0.1;
 
 				fixed detailSize = .4;
-				fixed detailBlend = .2+.8 * edge;
+				fixed detailBlend = _DetailBlend * edge;
 				
 				fixed detail = tex2D(_DetailTex,frac(i.worldPos*detailSize)+displace).r;
 				detail *=tex2D(_DetailTex,frac(fixed2(i.worldPos.x*-1,i.worldPos.y)*detailSize/2+_Time.x*2) -displace).b;
@@ -108,7 +111,7 @@
 				col.a=lerp(col.a,col.a*detail,detailBlend);
 
 				fixed addDetail = tex2D(_AddDetailTex,frac(i.worldPos/8+_Time.x*displace/12)+displace).r;
-				fixed addDetailBlend = 0.2;
+				fixed addDetailBlend = _AddDetailBlend;
 				col.a+=addDetail*inner*addDetailBlend;
 
 				col.rgb =lerp(_SmokeFadeColor,_SmokeColor,col.a);

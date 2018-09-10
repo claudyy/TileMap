@@ -5,7 +5,7 @@ namespace ClaudeFehlen.Tileset.Pathfinding {
 
     public class Heap<T> where T : IHeapItem<T> {
 
-        public T[] items;
+        T[] items;
         int currentItemCount;
 
         public Heap(int maxHeapSize) {

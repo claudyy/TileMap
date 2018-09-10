@@ -49,7 +49,7 @@
 				o.uv = v.uv;
 				return o;
 			}
-			const static int MAX_EMITER = 4;
+			const static int MAX_EMITER = 6;
 			sampler2D _MainTex,_DirTex;
 			float _Dissipation,_Minimum,_DirDissipation;
 			float _DirScale,_DirFactor,_DirSpeed,_DirOffsetYFactor;

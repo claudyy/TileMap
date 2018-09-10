@@ -29,12 +29,12 @@ Material:
     m_Floats:
     - _ChunkDirX: 1
     - _ChunkDirY: 1
-    - _ChunkX: 5
-    - _ChunkY: 2
+    - _ChunkX: 2
+    - _ChunkY: 1
     - _DirDissipation: 0.12
-    - _DirFactor: 5
+    - _DirFactor: 1.51
     - _DirOffsetYFactor: 0
-    - _DirScale: 3
+    - _DirScale: 1
     - _DirSpeed: 1
     - _Dissipation: 1
     - _Minimum: 0.0215

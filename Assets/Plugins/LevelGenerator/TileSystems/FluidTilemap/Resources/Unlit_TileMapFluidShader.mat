@@ -34,7 +34,9 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    m_Floats: []
+    m_Floats:
+    - _AddDetailBlend: 0.075
+    - _DetailBlend: 0.62
     m_Colors:
     - _SmokeColor: {r: 0.07778566, g: 0.8679245, b: 0.8393305, a: 1}
     - _SmokeFadeColor: {r: 1, g: 0.042452812, b: 0.64899695, a: 1}
